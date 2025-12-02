@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: #0f1216;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cinemates.controller.GalleryController">
+
+    <top>
+        <VBox BorderPane.alignment="CENTER">
+            <children>
+                <HBox alignment="CENTER_LEFT" prefHeight="70.0" prefWidth="1200.0" spacing="20.0" style="-fx-background-color: #1a1a2e; -fx-padding: 10 30;">
+                    <children>
+                        <Label text="MOTCHILL" textFill="#d45b12">
+                            <font><Font name="Impact" size="32.0" /></font>
+                        </Label>
+                        <HBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+                            <children>
+                                <TextField promptText="Nhập tên phim bạn muốn tìm kiếm..." style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 8 15; -fx-font-size: 14;" HBox.hgrow="ALWAYS">
+                                    <HBox.margin><Insets left="50.0" right="50.0" /></HBox.margin>
+                                </TextField>
+                            </children>
+                        </HBox>
+                        <Button style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-weight: bold;" text="Đăng nhập" />
+                        <Button style="-fx-background-color: #d45b12; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;" text="Đăng ký" />
+                    </children>
+                </HBox>
+
+                <HBox alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="1200.0" spacing="20.0" style="-fx-background-color: #26263a; -fx-padding: 0 30;">
+                    <children>
+                        <Button style="-fx-background-color: transparent; -fx-text-fill: #d45b12; -fx-font-weight: bold;" text="PHIM MỚI" />
+                        <Button style="-fx-background-color: transparent; -fx-text-fill: white;" text="PHIM CHIẾU RẠP" />
+
+                        <MenuButton style="-fx-background-color: transparent; -fx-mark-color: white;">
+                            <graphic>
+                                <Label style="-fx-font-weight: bold; -fx-font-size: 13px;" text="THỂ LOẠI" textFill="WHITE" />
+                            </graphic>
+                            <items>
+                                <MenuItem mnemonicParsing="false" text="Cổ Trang" />
+                                <MenuItem mnemonicParsing="false" text="Hài Hước" />
+                                <MenuItem mnemonicParsing="false" text="Phiêu Lưu" />
+                                <MenuItem mnemonicParsing="false" text="Chính kịch" />
+                                <MenuItem mnemonicParsing="false" text="Hành Động" />
+                                <MenuItem mnemonicParsing="false" text="Tình Cảm" />
+                                <MenuItem mnemonicParsing="false" text="Bí ẩn" />
+                                <MenuItem mnemonicParsing="false" text="Hình Sự" />
+                                <MenuItem mnemonicParsing="false" text="Viễn Tưởng" />
+                                <MenuItem mnemonicParsing="false" text="Gia Đình" />
+                                <MenuItem mnemonicParsing="false" text="Khoa Học" />
+                                <MenuItem mnemonicParsing="false" text="Võ Thuật" />
+                                <MenuItem mnemonicParsing="false" text="Tâm Lý" />
+                                <MenuItem mnemonicParsing="false" text="Kinh Dị" />
+                            </items>
+                        </MenuButton>
+
+                        <MenuButton style="-fx-background-color: transparent; -fx-mark-color: white;">
+                            <graphic>
+                                <Label style="-fx-font-weight: bold; -fx-font-size: 13px;" text="QUỐC GIA" textFill="WHITE" />
+                            </graphic>
+                            <items>
+                                <MenuItem mnemonicParsing="false" text="Trung Quốc" />
+                                <MenuItem mnemonicParsing="false" text="Hàn Quốc" />
+                                <MenuItem mnemonicParsing="false" text="Nhật Bản" />
+                                <MenuItem mnemonicParsing="false" text="Hồng Kông" />
+                                <MenuItem mnemonicParsing="false" text="Âu Mỹ" />
+                                <MenuItem mnemonicParsing="false" text="Đài Loan" />
+                                <MenuItem mnemonicParsing="false" text="Thái Lan" />
+                                <MenuItem mnemonicParsing="false" text="Anh" />
+                                <MenuItem mnemonicParsing="false" text="Canada" />
+                                <MenuItem mnemonicParsing="false" text="Nga" />
+                            </items>
+                        </MenuButton>
+
+                        <Button style="-fx-background-color: transparent; -fx-text-fill: white;" text="PHIM LẺ" />
+                        <Button style="-fx-background-color: transparent; -fx-text-fill: white;" text="PHIM BỘ" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background: #0f1216; -fx-background-color: transparent;" vbarPolicy="AS_NEEDED" BorderPane.alignment="CENTER">
+            <content>
+                <VBox spacing="25.0" style="-fx-background-color: #0f1216;">
+                    <padding>
+                        <Insets bottom="30.0" left="20.0" right="20.0" top="20.0" />
+                    </padding>
+                    <children>
+
+                        <Label text="🔥 PHIM ĐỀ CỬ" textFill="#d45b12">
+                            <font><Font name="System Bold" size="22.0" /></font>
+                        </Label>
+
+                        <ScrollPane fx:id="trendingScrollPane" fitToHeight="true" hbarPolicy="NEVER" pannable="true" style="-fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="NEVER">
+                            <content>
+                                <HBox spacing="15.0" style="-fx-background-color: #0f1216;">
+                                    <children>
+                                        <VBox onMouseClicked="#goToDetail" style="-fx-cursor: hand;">
+                                            <ImageView fitHeight="180.0" fitWidth="300.0" pickOnBounds="true" preserveRatio="false"><image><Image url="@image/background.png" /></image></ImageView>
+                                            <Label text="Love &amp; Crown" textFill="WHITE" wrapText="true"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                        </VBox>
+                                        <VBox onMouseClicked="#goToDetail" style="-fx-cursor: hand;">
+                                            <ImageView fitHeight="180.0" fitWidth="300.0" pickOnBounds="true" preserveRatio="false"><image><Image url="@image/background.png" /></image></ImageView>
+                                            <Label text="Đất Xanh Sinh Cú" textFill="WHITE" wrapText="true"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                        </VBox>
+                                        <VBox onMouseClicked="#goToDetail" style="-fx-cursor: hand;">
+                                            <ImageView fitHeight="180.0" fitWidth="300.0" pickOnBounds="true" preserveRatio="false"><image><Image url="@image/background.png" /></image></ImageView>
+                                            <Label text="Gia Đình Bão Tố" textFill="WHITE" wrapText="true"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                        </VBox>
+                                        <VBox onMouseClicked="#goToDetail" style="-fx-cursor: hand;">
+                                            <ImageView fitHeight="180.0" fitWidth="300.0" pickOnBounds="true" preserveRatio="false"><image><Image url="@image/background.png" /></image></ImageView>
+                                            <Label text="Avengers: Endgame" textFill="WHITE" wrapText="true"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                        </VBox>
+                                        <VBox onMouseClicked="#goToDetail" style="-fx-cursor: hand;">
+                                            <ImageView fitHeight="180.0" fitWidth="300.0" pickOnBounds="true" preserveRatio="false"><image><Image url="@image/background.png" /></image></ImageView>
+                                            <Label text="Transformer 5" textFill="WHITE" wrapText="true"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                        </VBox>
+                                    </children>
+                                </HBox>
+                            </content>
+                        </ScrollPane>
+
+                        <Label text="🍿 PHIM CHIẾU RẠP MỚI" textFill="#d45b12">
+                            <font><Font name="System Bold" size="20.0" /></font>
+                        </Label>
+
+                        <ScrollPane  fitToHeight="true" hbarPolicy="AS_NEEDED" pannable="true" style="-fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="NEVER">
+                            <content>
+                                <HBox  fx:id="newMoviesContainer" spacing="15.0" style="-fx-background-color: #0f1216;">
+                                    <children>
+                                        <VBox onMouseClicked="#goToDetail" spacing="5.0" style="-fx-cursor: hand;">
+                                            <ImageView fitHeight="200.0" fitWidth="140.0" pickOnBounds="true" preserveRatio="false"><image><Image url="@image/background.png" /></image></ImageView>
+                                            <Label text="Mai" textFill="WHITE" wrapText="true"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                        </VBox>
+                                        <VBox onMouseClicked="#goToDetail" spacing="5.0" style="-fx-cursor: hand;">
+                                            <ImageView fitHeight="200.0" fitWidth="140.0" pickOnBounds="true" preserveRatio="false"><image><Image url="@image/background.png" /></image></ImageView>
+                                            <Label text="Đào, Phở và Piano" textFill="WHITE" wrapText="true"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                        </VBox>
+                                        <VBox onMouseClicked="#goToDetail" spacing="5.0" style="-fx-cursor: hand;">
+                                            <ImageView fitHeight="200.0" fitWidth="140.0" pickOnBounds="true" preserveRatio="false"><image><Image url="@image/background.png" /></image></ImageView>
+                                            <Label text="Quỷ Cẩu" textFill="WHITE" wrapText="true"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                        </VBox>
+                                        <VBox onMouseClicked="#goToDetail" spacing="5.0" style="-fx-cursor: hand;">
+                                            <ImageView fitHeight="200.0" fitWidth="140.0" pickOnBounds="true" preserveRatio="false"><image><Image url="@image/background.png" /></image></ImageView>
+                                            <Label text="Kẻ Ăn Hồn" textFill="WHITE" wrapText="true"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                        </VBox>
+                                        <VBox onMouseClicked="#goToDetail" spacing="5.0" style="-fx-cursor: hand;">
+                                            <ImageView fitHeight="200.0" fitWidth="140.0" pickOnBounds="true" preserveRatio="false"><image><Image url="@image/background.png" /></image></ImageView>
+                                            <Label text="Godzilla x Kong" textFill="WHITE" wrapText="true"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                        </VBox>
+                                    </children>
+                                </HBox>
+                            </content>
+                        </ScrollPane>
+
+                        <Label text="🇰🇷 PHIM HÀN QUỐC HOT" textFill="#d45b12">
+                            <font><Font name="System Bold" size="20.0" /></font>
+                        </Label>
+
+                        <ScrollPane fitToHeight="true" hbarPolicy="AS_NEEDED" pannable="true" style="-fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="NEVER">
+                            <content>
+                                <HBox spacing="15.0" style="-fx-background-color: #0f1216;">
+                                    <children>
+                                        <VBox onMouseClicked="#goToDetail" spacing="5.0" style="-fx-cursor: hand;">
+                                            <ImageView fitHeight="200.0" fitWidth="140.0" pickOnBounds="true" preserveRatio="false"><image><Image url="@image/background.png" /></image></ImageView>
+                                            <Label text="Exhuma: Quật Mộ" textFill="WHITE" wrapText="true"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                        </VBox>
+                                        <VBox onMouseClicked="#goToDetail" spacing="5.0" style="-fx-cursor: hand;">
+                                            <ImageView fitHeight="200.0" fitWidth="140.0" pickOnBounds="true" preserveRatio="false"><image><Image url="@image/background.png" /></image></ImageView>
+                                            <Label text="Queen of Tears" textFill="WHITE" wrapText="true"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                        </VBox>
+                                        <VBox onMouseClicked="#goToDetail" spacing="5.0" style="-fx-cursor: hand;">
+                                            <ImageView fitHeight="200.0" fitWidth="140.0" pickOnBounds="true" preserveRatio="false"><image><Image url="@image/background.png" /></image></ImageView>
+                                            <Label text="Parasyte: The Grey" textFill="WHITE" wrapText="true"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                        </VBox>
+                                        <VBox onMouseClicked="#goToDetail" spacing="5.0" style="-fx-cursor: hand;">
+                                            <ImageView fitHeight="200.0" fitWidth="140.0" pickOnBounds="true" preserveRatio="false"><image><Image url="@image/background.png" /></image></ImageView>
+                                            <Label text="Sweet Home 2" textFill="WHITE" wrapText="true"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                        </VBox>
+                                        <VBox onMouseClicked="#goToDetail" spacing="5.0" style="-fx-cursor: hand;">
+                                            <ImageView fitHeight="200.0" fitWidth="140.0" pickOnBounds="true" preserveRatio="false"><image><Image url="@image/background.png" /></image></ImageView>
+                                            <Label text="My Demon" textFill="WHITE" wrapText="true"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                        </VBox>
+                                    </children>
+                                </HBox>
+                            </content>
+                        </ScrollPane>
+
+                        <Label text="👾 HOẠT HÌNH &amp; ANIME" textFill="#d45b12">
+                            <font><Font name="System Bold" size="20.0" /></font>
+                        </Label>
+
+                        <ScrollPane fitToHeight="true" hbarPolicy="AS_NEEDED" pannable="true" style="-fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="NEVER">
+                            <content>
+                                <HBox spacing="15.0" style="-fx-background-color: #0f1216;">
+                                    <children>
+                                        <VBox onMouseClicked="#goToDetail" spacing="5.0" style="-fx-cursor: hand;">
+                                            <ImageView fitHeight="200.0" fitWidth="140.0" pickOnBounds="true" preserveRatio="false"><image><Image url="@image/background.png" /></image></ImageView>
+                                            <Label text="Kung Fu Panda 4" textFill="WHITE" wrapText="true"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                        </VBox>
+                                        <VBox onMouseClicked="#goToDetail" spacing="5.0" style="-fx-cursor: hand;">
+                                            <ImageView fitHeight="200.0" fitWidth="140.0" pickOnBounds="true" preserveRatio="false"><image><Image url="@image/background.png" /></image></ImageView>
+                                            <Label text="Conan Movie 26" textFill="WHITE" wrapText="true"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                        </VBox>
+                                        <VBox onMouseClicked="#goToDetail" spacing="5.0" style="-fx-cursor: hand;">
+                                            <ImageView fitHeight="200.0" fitWidth="140.0" pickOnBounds="true" preserveRatio="false"><image><Image url="@image/background.png" /></image></ImageView>
+                                            <Label text="Doraemon 2024" textFill="WHITE" wrapText="true"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                        </VBox>
+                                        <VBox onMouseClicked="#goToDetail" spacing="5.0" style="-fx-cursor: hand;">
+                                            <ImageView fitHeight="200.0" fitWidth="140.0" pickOnBounds="true" preserveRatio="false"><image><Image url="@image/background.png" /></image></ImageView>
+                                            <Label text="Spy x Family" textFill="WHITE" wrapText="true"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                        </VBox>
+                                        <VBox onMouseClicked="#goToDetail" spacing="5.0" style="-fx-cursor: hand;">
+                                            <ImageView fitHeight="200.0" fitWidth="140.0" pickOnBounds="true" preserveRatio="false"><image><Image url="@image/background.png" /></image></ImageView>
+                                            <Label text="Kimetsu no Yaiba" textFill="WHITE" wrapText="true"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                        </VBox>
+                                    </children>
+                                </HBox>
+                            </content>
+                        </ScrollPane>
+
+                    </children>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+
+    <right>
+        <VBox prefHeight="200.0" prefWidth="300.0" spacing="10.0" style="-fx-background-color: #15181d; -fx-padding: 20;" BorderPane.alignment="CENTER">
+            <children>
+                <Label text="TOP PHIM TUẦN" textFill="#d45b12">
+                    <font><Font name="System Bold" size="18.0" /></font>
+                    <VBox.margin><Insets bottom="10.0" /></VBox.margin>
+                </Label>
+                <Label style="-fx-text-fill: #666666;" text="-----------------------------------------" />
+
+                <HBox spacing="10.0" style="-fx-cursor: hand;">
+                    <Label style="-fx-background-color: #d45b12; -fx-text-fill: white; -fx-background-radius: 50; -fx-min-width: 25; -fx-alignment: center;" text="1" />
+                    <VBox>
+                        <Label text="Ám Hà Truyện" textFill="WHITE"><font><Font name="System Bold" size="14.0" /></font></Label>
+                        <Label text="370454 lượt xem" textFill="#888888"><font><Font size="12.0" /></font></Label>
+                    </VBox>
+                </HBox>
+
+                <HBox spacing="10.0" style="-fx-cursor: hand;">
+                    <Label style="-fx-background-color: #d45b12; -fx-text-fill: white; -fx-background-radius: 50; -fx-min-width: 25; -fx-alignment: center;" text="2" />
+                    <VBox>
+                        <Label text="Thần Đèn Ơi" textFill="WHITE"><font><Font name="System Bold" size="14.0" /></font></Label>
+                        <Label text="362765 lượt xem" textFill="#888888"><font><Font size="12.0" /></font></Label>
+                    </VBox>
+                </HBox>
+
+                <HBox spacing="10.0" style="-fx-cursor: hand;">
+                    <Label style="-fx-background-color: #d45b12; -fx-text-fill: white; -fx-background-radius: 50; -fx-min-width: 25; -fx-alignment: center;" text="3" />
+                    <VBox>
+                        <Label text="Thiên Địa Kiếm" textFill="WHITE"><font><Font name="System Bold" size="14.0" /></font></Label>
+                        <Label text="350884 lượt xem" textFill="#888888"><font><Font size="12.0" /></font></Label>
+                    </VBox>
+                </HBox>
+
+                <HBox spacing="10.0" style="-fx-cursor: hand;">
+                    <Label style="-fx-background-color: #d45b12; -fx-text-fill: white; -fx-background-radius: 50; -fx-min-width: 25; -fx-alignment: center;" text="4" />
+                    <VBox>
+                        <Label text="Vân Chi Vũ" textFill="WHITE"><font><Font name="System Bold" size="14.0" /></font></Label>
+                        <Label text="241614 lượt xem" textFill="#888888"><font><Font size="12.0" /></font></Label>
+                    </VBox>
+                </HBox>
+
+                <HBox spacing="10.0" style="-fx-cursor: hand;">
+                    <Label style="-fx-background-color: #d45b12; -fx-text-fill: white; -fx-background-radius: 50; -fx-min-width: 25; -fx-alignment: center;" text="5" />
+                    <VBox>
+                        <Label text="Sơn Hà Lệnh" textFill="WHITE"><font><Font name="System Bold" size="14.0" /></font></Label>
+                        <Label text="198222 lượt xem" textFill="#888888"><font><Font size="12.0" /></font></Label>
+                    </VBox>
+                </HBox>
+
+            </children>
+        </VBox>
+    </right>
+</BorderPane>

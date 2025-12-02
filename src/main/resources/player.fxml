@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.media.MediaView?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.TextFlow?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: #0f1216;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cinemates.controller.PlayerController">
+
+    <top>
+        <VBox BorderPane.alignment="CENTER">
+            <children>
+                <HBox alignment="CENTER_LEFT" prefHeight="60.0" prefWidth="1200.0" spacing="20.0" style="-fx-background-color: #1a1a2e; -fx-padding: 0 30;">
+                    <children>
+                        <Label text="MOTCHILL" textFill="#d45b12"><font><Font name="Impact" size="28.0" /></font></Label>
+                        <Button fx:id="backBtn" text="⬅ Quay lại" style="-fx-background-color: transparent; -fx-text-fill: #aaaaaa; -fx-font-weight: bold; -fx-cursor: hand; -fx-font-size: 14px;" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background: #0f1216; -fx-background-color: transparent;" BorderPane.alignment="CENTER">
+            <content>
+                <VBox spacing="15.0" style="-fx-background-color: #0f1216; -fx-padding: 20;">
+                    <children>
+
+                        <StackPane onMouseClicked="#togglePlay" style="-fx-background-color: black; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 10, 0, 0, 5); -fx-cursor: hand;">
+                            <MediaView fx:id="mediaView" fitHeight="500.0" fitWidth="850.0" />
+                        </StackPane>
+
+                        <HBox alignment="CENTER_LEFT" spacing="15.0" style="-fx-background-color: #1a1a2e; -fx-padding: 10; -fx-background-radius: 5;">
+                            <children>
+                                <Button onAction="#skipBack" text="-10s" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-font-size: 12px;"/>
+
+                                <Button fx:id="playBtn" text="▶" style="-fx-background-color: #d45b12; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-font-size: 14px;" />
+
+                                <Button onAction="#skipForward" text="+10s" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-font-size: 12px;"/>
+
+                                <Slider fx:id="timeSlider" HBox.hgrow="ALWAYS" style="-fx-cursor: hand;" />
+                                <Label fx:id="timeLabel" text="00:00 / --:--" textFill="WHITE" />
+
+                                <Button fx:id="muteBtn" text="🔊" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-cursor: hand;" />
+                                <Slider fx:id="volumeSlider" prefWidth="100.0" value="100.0" />
+                            </children>
+                        </HBox>
+
+                        <VBox spacing="10.0" style="-fx-background-color: #15181d; -fx-padding: 15; -fx-background-radius: 5;">
+                            <children>
+                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                    <Label text="Server ▶" textFill="WHITE" style="-fx-font-weight: bold;"/>
+                                    <Button text="VIP #1" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                                    <Button text="VIP #2" style="-fx-background-color: #2196f3; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                                </HBox>
+                                <HBox alignment="CENTER_LEFT" spacing="5.0">
+                                    <Label text="#VietSub:" textFill="#d45b12" style="-fx-font-weight: bold;"/>
+                                    <Button text="1" style="-fx-background-color: #d45b12; -fx-text-fill: white; -fx-min-width: 30;"/>
+                                    <Button text="2" style="-fx-background-color: #333; -fx-text-fill: white; -fx-min-width: 30;"/>
+                                </HBox>
+                            </children>
+                        </VBox>
+
+                        <VBox spacing="5.0">
+                            <Label fx:id="titleLabel" text="Đang tải tên phim..." textFill="#d45b12">
+                                <font><Font name="System Bold" size="24.0" /></font>
+                            </Label>
+                            <TextFlow>
+                                <Text fx:id="descText" fill="#cccccc" text="Đang tải nội dung..." />
+                            </TextFlow>
+                        </VBox>
+                    </children>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+
+    <right>
+        <StackPane prefWidth="320.0" style="-fx-background-color: #15181d; -fx-border-color: #333; -fx-border-width: 0 0 0 1;" BorderPane.alignment="CENTER">
+            <children>
+
+                <VBox fx:id="offlineSidebar" spacing="10.0" style="-fx-background-color: #15181d; -fx-padding: 20;" visible="false">
+                    <children>
+                        <Label text="TOP PHIM TUẦN" textFill="#d45b12"><font><Font name="System Bold" size="18.0" /></font></Label>
+                        <Label style="-fx-text-fill: #666666;" text="-----------------------------------------" />
+                        <HBox spacing="10.0">
+                            <Label style="-fx-background-color: #d45b12; -fx-text-fill: white; -fx-background-radius: 50; -fx-min-width: 25; -fx-alignment: center;" text="1" />
+                            <VBox><Label text="Ám Hà Truyện" textFill="WHITE" /><Label text="370k views" textFill="#888" /></VBox>
+                        </HBox>
+                        <HBox spacing="10.0">
+                            <Label style="-fx-background-color: #d45b12; -fx-text-fill: white; -fx-background-radius: 50; -fx-min-width: 25; -fx-alignment: center;" text="2" />
+                            <VBox><Label text="Thần Đèn" textFill="WHITE" /><Label text="360k views" textFill="#888" /></VBox>
+                        </HBox>
+                    </children>
+                </VBox>
+
+                <VBox fx:id="p2pSidebar" spacing="0.0" visible="true">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" spacing="10.0" style="-fx-padding: 15; -fx-background-color: #1a1a2e;">
+                            <Circle radius="5.0" fill="#e50914" />
+                            <Label text="Phòng Chiếu P2P" textFill="WHITE" style="-fx-font-weight: bold;"/>
+                        </HBox>
+
+                        <StackPane style="-fx-background-color: #111; -fx-padding: 15; -fx-border-color: #333; -fx-border-width: 0 0 1 0;">
+                            <children>
+
+                                <VBox fx:id="connectionMenu" spacing="10.0" alignment="CENTER">
+                                    <Label text="Bạn muốn làm gì?" textFill="#888" />
+                                    <HBox spacing="10.0">
+                                        <Button fx:id="btnCreateRoom" text="Tạo Phòng" style="-fx-background-color: #d45b12; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                                        <Button fx:id="btnJoinRoom" text="Vào Phòng" style="-fx-background-color: #2196f3; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                                    </HBox>
+                                </VBox>
+
+                                <VBox fx:id="hostPanel" spacing="10.0" alignment="CENTER" visible="false">
+                                    <Label text="Mã phòng của bạn:" textFill="#888" />
+                                    <Label fx:id="lblRoomId" text="loading..." textFill="#00ff00" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-border-color: #444; -fx-border-radius: 5; -fx-padding: 5 20;"/>
+                                    <Label text="Gửi mã này cho bạn bè" textFill="#555" style="-fx-font-size: 10px;"/>
+                                    <Button fx:id="btnCancelHost" text="Hủy phòng" style="-fx-background-color: transparent; -fx-text-fill: #e50914; -fx-underline: true; -fx-cursor: hand;"/>
+                                </VBox>
+
+                                <VBox fx:id="guestPanel" spacing="10.0" alignment="CENTER" visible="false">
+                                    <Label text="Nhập Mã Phòng:" textFill="#888" />
+                                    <TextField fx:id="ipField" promptText="VD: 1234" style="-fx-background-color: #333; -fx-text-fill: white; -fx-alignment: CENTER;"/>
+                                    <HBox spacing="10.0" alignment="CENTER">
+                                        <Button fx:id="btnCancelGuest" text="Quay lại" style="-fx-background-color: transparent; -fx-text-fill: #aaa; -fx-underline: true; -fx-cursor: hand;"/>
+                                        <Button fx:id="connectBtn" text="KẾT NỐI" style="-fx-background-color: #2196f3; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;"/>
+                                    </HBox>
+                                </VBox>
+
+                            </children>
+                        </StackPane>
+
+                        <ListView fx:id="chatListView" VBox.vgrow="ALWAYS" style="-fx-background-color: #15181d; -fx-control-inner-background: #15181d;"/>
+
+                        <HBox spacing="10.0" style="-fx-padding: 10; -fx-background-color: #1a1a2e;">
+                            <TextField fx:id="chatInput" promptText="Chat..." style="-fx-background-color: #333; -fx-text-fill: white;" HBox.hgrow="ALWAYS"/>
+                            <Button fx:id="sendBtn" text="Gửi" style="-fx-background-color: #d45b12; -fx-text-fill: white;"/>
+                        </HBox>
+                    </children>
+                </VBox>
+
+            </children>
+        </StackPane>
+    </right>
+</BorderPane>
