@@ -71,12 +71,12 @@ public class PlayerController implements Initializable {
     private boolean isMuted = false;
     private boolean isSyncing = false;
 
-    private static final String SERVER_HOST = "127.0.0.1";
-    private static final int SERVER_PORT = 5000;
+    private static final String SERVER_HOST = "vumfo-1-52-23-46.a.free.pinggy.link";
+    private static final int SERVER_PORT = 42717;
 
-    // --- CẤU HÌNH GIẢM TẢI CHO MÁY ---
+    // --- CẤU HÌNH GIẢM TẢI CHO MÁY ---SYNC_TOLERANCE
     // Tăng độ lệch cho phép lên 2.0s để máy đỡ phải sửa liên tục
-    private static final double SYNC_TOLERANCE = 2.0;
+    private static final double SYNC_TOLERANCE = 3.0;
     private static final double CATCHUP_BUFFER = 0.5;
 
     @Override
@@ -170,7 +170,7 @@ public class PlayerController implements Initializable {
     private void startSyncTimer() {
         if (syncTimer != null) syncTimer.stop();
         // --- GIẢM TẢI: Kiểm tra mỗi 4 giây thay vì 2 giây ---
-        syncTimer = new Timeline(new KeyFrame(Duration.seconds(4), event -> {
+        syncTimer = new Timeline(new KeyFrame(Duration.seconds(5), event -> {
             if (isP2PMode && isHost && mediaPlayer != null) {
                 double currentT = mediaPlayer.getCurrentTime().toSeconds();
                 String status = (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) ? "PLAY" : "PAUSE";

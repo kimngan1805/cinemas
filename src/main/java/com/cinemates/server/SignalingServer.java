@@ -12,21 +12,16 @@ import java.util.Random;
 public class SignalingServer {
     private static final int PORT = 5000;
 
-    // Map: Mã phòng -> Thông tin Host (IP Public, IP Local)
-    private static final Map<String, HostInfo> activeRooms = new HashMap<>();
-
-    // Class lưu thông tin Host
-    static class HostInfo {
-        String publicIp;
-        String localIp; // Cái này để mở rộng sau này nếu cần
-
-        public HostInfo(String publicIp) {
-            this.publicIp = publicIp;
-        }
-    }
+    // Map lưu phòng
+    private static final Map<String, String> activeRooms = new HashMap<>();
 
     public static void main(String[] args) {
-        System.out.println(">>> SERVER ĐÁM MÂY (GIẢ LẬP) ĐANG CHẠY PORT " + PORT + " <<<");
+        // IN CÁI HEADER BẢNG BÁO CÁO CHO NÓ NGẦU
+        System.out.println("\n>>> HỆ THỐNG GIÁM SÁT KẾT NỐI P2P (SERVER MONITOR) <<<");
+        System.out.println("==================================================================================");
+        System.out.println(String.format("| %-15s | %-18s | %-18s | %-15s |", "USERNAME", "PUBLIC IP (WAN)", "LOCAL IP (LAN)", "STATUS"));
+        System.out.println("==================================================================================");
+
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             while (true) {
                 new Thread(new ClientHandler(serverSocket.accept())).start();
@@ -44,46 +39,38 @@ public class SignalingServer {
                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
-                // Lấy IP Public của người đang kết nối tới Server
-                String clientIp = socket.getInetAddress().getHostAddress();
-                System.out.println("📩 Tin nhắn từ: " + clientIp);
+                // Lấy IP thật (Do Pinggy forward tới thì thường là 127.0.0.1 hoặc IP gateway)
+                // Nhưng mình sẽ dùng cái IP giả lập từ Client gửi lên để hiển thị
+                String realIp = socket.getInetAddress().getHostAddress();
 
                 String request;
                 while ((request = in.readLine()) != null) {
                     String[] parts = request.split(" ");
                     String command = parts[0];
 
-                    if (command.equals("CREATE")) {
+                    // --- XỬ LÝ LỆNH BÁO CÁO (REPORT) ---
+                    if (command.equals("REPORT")) {
+                        // Cấu trúc tin nhắn: REPORT <Tên> <IP_Giả_Lập>
+                        String username = (parts.length > 1) ? parts[1] : "Unknown";
+                        String simulatedIp = (parts.length > 2) ? parts[2] : "Unknown";
+
+                        // In ra bảng theo định dạng cột cho đẹp
+                        System.out.println(String.format("| %-15s | %-18s | %-18s | %-15s |",
+                                username, realIp, simulatedIp, "✅ ONLINE"));
+
+                        System.out.println("----------------------------------------------------------------------------------");
+                    }
+
+                    // --- CÁC LỆNH CŨ (GIỮ NGUYÊN) ---
+                    else if (command.equals("CREATE")) {
                         String roomId = String.valueOf(1000 + new Random().nextInt(9000));
-
-                        // Lưu IP của Host lại
-                        activeRooms.put(roomId, new HostInfo(clientIp));
-
+                        activeRooms.put(roomId, "127.0.0.1"); // Demo local thì cứ trả về localhost là đc
                         out.println("CREATED " + roomId);
-                        System.out.println("✅ Phòng " + roomId + " tạo bởi " + clientIp);
                     }
                     else if (command.equals("JOIN")) {
-                        if (parts.length < 2) { out.println("ERROR"); continue; }
                         String roomId = parts[1];
-
                         if (activeRooms.containsKey(roomId)) {
-                            HostInfo host = activeRooms.get(roomId);
-
-                            // --- LOGIC THÔNG MINH Ở ĐÂY ---
-                            // So sánh IP của người xin vào (Guest) và IP chủ phòng (Host)
-                            String targetIp;
-
-                            if (host.publicIp.equals(clientIp)) {
-                                // Nếu IP giống hệt nhau -> Tức là đang test trên cùng 1 máy hoặc cùng Wifi
-                                System.out.println("⚠️ Phát hiện cùng mạng/máy. Trả về localhost.");
-                                targetIp = "127.0.0.1";
-                            } else {
-                                // Nếu khác IP -> Trả về IP Public để kết nối qua Internet
-                                targetIp = host.publicIp;
-                            }
-
-                            out.println("FOUND " + targetIp);
-                            System.out.println("🔗 Chỉ đường cho Guest tới: " + targetIp);
+                            out.println("FOUND " + activeRooms.get(roomId));
                         } else {
                             out.println("NOT_FOUND");
                         }
