@@ -1,10 +1,14 @@
 package com.cinemates.controller;
 
+import com.cinemates.ClientSession;
 import com.cinemates.P2PNetwork;
 import com.cinemates.model.Episode;
 import com.cinemates.model.Movie;
 import com.cinemates.utils.DatabaseHandler;
 import com.cinemates.utils.DriveUtils;
+import javafx.animation.KeyFrame;
+import javafx.animation.PauseTransition;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -21,22 +25,19 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class PlayerController implements Initializable {
 
-    // --- FXML VARS ---
     @FXML private MediaView mediaView;
     @FXML private Button playBtn;
     @FXML private Button backBtn;
     @FXML private Label titleLabel;
+    @FXML private Text descText;
     @FXML private Slider volumeSlider;
     @FXML private Slider timeSlider;
     @FXML private Label timeLabel;
@@ -44,6 +45,7 @@ public class PlayerController implements Initializable {
 
     @FXML private VBox offlineSidebar;
     @FXML private VBox p2pSidebar;
+    @FXML private Label lblMemberCount;
     @FXML private VBox connectionMenu;
     @FXML private Button btnCreateRoom;
     @FXML private Button btnJoinRoom;
@@ -58,43 +60,90 @@ public class PlayerController implements Initializable {
     @FXML private TextField chatInput;
     @FXML private Button sendBtn;
 
-    // --- DATA VARS ---
     private MediaPlayer mediaPlayer;
     private Movie currentMovie;
     private Duration totalDuration;
     private P2PNetwork p2p;
+    private Timeline syncTimer;
 
     private boolean isP2PMode = false;
     private boolean isHost = false;
     private boolean isMuted = false;
+    private boolean isSyncing = false;
 
     private static final String SERVER_HOST = "127.0.0.1";
     private static final int SERVER_PORT = 5000;
 
+    // --- CẤU HÌNH GIẢM TẢI CHO MÁY ---
+    // Tăng độ lệch cho phép lên 2.0s để máy đỡ phải sửa liên tục
+    private static final double SYNC_TOLERANCE = 2.0;
+    private static final double CATCHUP_BUFFER = 0.5;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         p2p = new P2PNetwork();
-        p2p.setOnMessageReceived(msg -> Platform.runLater(() -> handleIncomingMessage(msg)));
 
-        // FIX LỖI 3: Thoát phòng sạch sẽ
-        backBtn.setOnAction(event -> {
-            cleanupAndExit(); // Ngắt kết nối mạng
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/detail.fxml"));
-                Parent root = loader.load();
-                if (currentMovie != null) {
-                    DetailController detailController = loader.getController();
-                    detailController.setMovieData(currentMovie.getId());
+        p2p.setOnMessageReceived(msg -> {
+            Platform.runLater(() -> {
+                if (msg.startsWith("CMD:COUNT:")) {
+                    String count = msg.split(":")[2];
+                    if (lblMemberCount != null) lblMemberCount.setText("Online: " + count);
+                    return;
                 }
-                Stage window = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                window.setScene(new Scene(root));
-                window.show();
-            } catch (IOException e) { e.printStackTrace(); }
+                if (msg.equals("CMD:CLOSE_ROOM")) {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Thông báo");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Chủ phòng đã thoát. Bạn sẽ quay về trang chi tiết.");
+                    alert.show();
+                    backToDetailScene(null);
+                    return;
+                }
+                if (msg.startsWith("CHAT:")) {
+                    String[] parts = msg.split(":", 3);
+                    if (parts.length >= 3) {
+                        String sender = parts[1];
+                        String content = parts[2];
+                        if (!sender.equals(ClientSession.myUsername)) {
+                            chatListView.getItems().add(sender + ": " + content);
+                        }
+                    }
+                    return;
+                }
+                if (msg.startsWith("CMD:")) {
+                    handleSyncCommand(msg);
+                } else if (msg.startsWith("SYSTEM: Connected")) {
+                    if (!isHost) requestSyncImmediate();
+                }
+            });
         });
 
+        backBtn.setOnAction(event -> backToDetailScene(event));
         playBtn.setOnAction(e -> togglePlay());
 
-        // Slider Time (Tua)
+        if (muteBtn != null) {
+            muteBtn.setOnAction(e -> {
+                if (mediaPlayer == null) return;
+                isMuted = !isMuted;
+                mediaPlayer.setMute(isMuted);
+                muteBtn.setText(isMuted ? "🔇" : "🔊");
+            });
+        }
+
+        if (volumeSlider != null) {
+            volumeSlider.setValue(100);
+            volumeSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+                if (mediaPlayer != null) {
+                    if (isMuted) {
+                        isMuted = false;
+                        mediaPlayer.setMute(false);
+                        muteBtn.setText("🔊");
+                    }
+                    mediaPlayer.setVolume(newVal.doubleValue() / 100.0);
+                }
+            });
+        }
+
         timeSlider.setOnMouseReleased(e -> {
             if (mediaPlayer != null) {
                 double newTime = timeSlider.getValue();
@@ -105,74 +154,78 @@ public class PlayerController implements Initializable {
             }
         });
 
-        // FIX LỖI 1: Mute đồng bộ
-        if (muteBtn != null) {
-            muteBtn.setOnAction(e -> {
-                if (mediaPlayer == null) return;
-                toggleMute(!isMuted); // Đảo ngược trạng thái hiện tại
-
-                // Gửi lệnh cho người khác
-                if (isP2PMode && isHost) {
-                    p2p.send("CMD:MUTE:" + isMuted);
-                }
-            });
-        }
-
         setupConnectionLogic();
 
         sendBtn.setOnAction(e -> {
             String msg = chatInput.getText();
             if (!msg.isEmpty()) {
-                p2p.send(msg);
+                String fullMsg = "CHAT:" + ClientSession.myUsername + ":" + msg;
+                p2p.send(fullMsg);
                 chatListView.getItems().add("Me: " + msg);
                 chatInput.clear();
             }
         });
     }
 
-    // --- HÀM XỬ LÝ TIN NHẮN TỚI ---
-    private void handleIncomingMessage(String msg) {
-        if (msg.startsWith("CMD:")) {
-            if (isP2PMode && !isHost) { // Chỉ Khách mới nghe lệnh Host
-                processCommand(msg);
+    private void startSyncTimer() {
+        if (syncTimer != null) syncTimer.stop();
+        // --- GIẢM TẢI: Kiểm tra mỗi 4 giây thay vì 2 giây ---
+        syncTimer = new Timeline(new KeyFrame(Duration.seconds(4), event -> {
+            if (isP2PMode && isHost && mediaPlayer != null) {
+                double currentT = mediaPlayer.getCurrentTime().toSeconds();
+                String status = (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) ? "PLAY" : "PAUSE";
+                p2p.send("CMD:AUTO_CHECK:" + currentT + ":" + status);
             }
-        } else {
-            chatListView.getItems().add("Friend: " + msg);
-        }
+        }));
+        syncTimer.setCycleCount(Timeline.INDEFINITE);
+        syncTimer.play();
     }
 
-    // --- XỬ LÝ LỆNH ĐỒNG BỘ (NÂNG CẤP) ---
-    private void processCommand(String cmd) {
+    private void requestSyncImmediate() {
+        p2p.send("CMD:REQUEST_INFO");
+    }
+
+    private void handleSyncCommand(String cmd) {
         if (mediaPlayer == null) return;
 
-        // 1. HOST NHẬN ĐƯỢC YÊU CẦU INFO
         if (isHost && cmd.equals("CMD:REQUEST_INFO")) {
             double t = mediaPlayer.getCurrentTime().toSeconds();
             String status = (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) ? "PLAY" : "PAUSE";
-            p2p.send("CMD:SYNC_ALL:" + t + ":" + status);
+            p2p.send("CMD:FORCE_SYNC:" + t + ":" + status);
             return;
         }
 
-        // 2. KHÁCH NHẬN LỆNH
+        if (isHost) return;
+
         try {
-            if (cmd.startsWith("CMD:SYNC_ALL:")) {
+            if (cmd.startsWith("CMD:FORCE_SYNC:") || cmd.startsWith("CMD:SYNC_ALL:")) {
                 String[] parts = cmd.split(":");
-                double seconds = Double.parseDouble(parts[2]);
+                double hostTime = Double.parseDouble(parts[2]);
                 String status = parts[3];
+                performSafeSeek(hostTime, status, true);
+            }
+            else if (cmd.startsWith("CMD:AUTO_CHECK:")) {
+                if (isSyncing) return; // Đang bận thì thôi
 
-                // FIX LỖI 2: Bù thời gian trễ mạng (Latency Compensation)
-                // Cộng thêm 0.5s để bù cho thời gian gửi tin
-                double compensatedTime = seconds + 0.5;
+                String[] parts = cmd.split(":");
+                double hostTime = Double.parseDouble(parts[2]);
+                String hostStatus = parts[3];
 
-                mediaPlayer.seek(Duration.seconds(compensatedTime));
-                timeSlider.setValue(compensatedTime);
+                double myTime = mediaPlayer.getCurrentTime().toSeconds();
+                double diff = hostTime - myTime;
 
-                if (status.equals("PLAY")) {
-                    mediaPlayer.play();
-                    playBtn.setText("⏸");
-                } else {
-                    mediaPlayer.pause();
-                    playBtn.setText("▶");
+                // Chỉ sửa nếu lệch nhiều (trên 2.0s)
+                if (Math.abs(diff) > SYNC_TOLERANCE) {
+                    System.out.println("!!! Lệch " + diff + "s. Đang sửa...");
+                    performSafeSeek(hostTime, hostStatus, false);
+                }
+                else {
+                    boolean amIPlaying = (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING);
+                    boolean isHostPlaying = hostStatus.equals("PLAY");
+                    if (amIPlaying != isHostPlaying) {
+                        if (isHostPlaying) { mediaPlayer.play(); playBtn.setText("⏸"); }
+                        else { mediaPlayer.pause(); playBtn.setText("▶"); }
+                    }
                 }
             }
             else if (cmd.equals("CMD:PAUSE")) {
@@ -185,29 +238,47 @@ public class PlayerController implements Initializable {
             }
             else if (cmd.startsWith("CMD:SEEK:")) {
                 double s = Double.parseDouble(cmd.split(":")[2]);
-                mediaPlayer.seek(Duration.seconds(s));
-            }
-            // FIX LỖI 1: Nhận lệnh Mute
-            else if (cmd.startsWith("CMD:MUTE:")) {
-                boolean muteStatus = Boolean.parseBoolean(cmd.split(":")[2]);
-                toggleMute(muteStatus);
+                performSafeSeek(s, null, true);
             }
         } catch (Exception e) {
             System.out.println("Lỗi xử lý lệnh: " + e.getMessage());
         }
     }
 
-    // --- CÁC HÀM ĐIỀU KHIỂN ---
+    private void performSafeSeek(double targetTime, String status, boolean isForce) {
+        isSyncing = true;
+        double finalTarget = targetTime;
+        if ("PLAY".equals(status)) {
+            finalTarget += CATCHUP_BUFFER;
+        }
+        mediaPlayer.seek(Duration.seconds(finalTarget));
+        timeSlider.setValue(finalTarget);
 
-    // Hàm bật/tắt tiếng (Dùng chung cho cả bấm nút và nhận lệnh mạng)
-    private void toggleMute(boolean mute) {
-        isMuted = mute;
-        mediaPlayer.setMute(isMuted);
-        muteBtn.setText(isMuted ? "🔇" : "🔊");
+        if ("PLAY".equals(status)) {
+            mediaPlayer.play();
+            playBtn.setText("⏸");
+        } else if ("PAUSE".equals(status)) {
+            mediaPlayer.pause();
+            playBtn.setText("▶");
+        }
+
+        PauseTransition cooldown = new PauseTransition(Duration.seconds(2));
+        cooldown.setOnFinished(e -> isSyncing = false);
+        cooldown.play();
     }
 
     @FXML public void togglePlay() {
         if (mediaPlayer == null) return;
+
+        if (isP2PMode && !isHost) {
+            if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+                mediaPlayer.pause();
+                playBtn.setText("▶");
+            } else {
+                p2p.send("CMD:REQUEST_INFO");
+            }
+            return;
+        }
 
         if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
             mediaPlayer.pause();
@@ -216,33 +287,28 @@ public class PlayerController implements Initializable {
         } else {
             mediaPlayer.play();
             playBtn.setText("⏸");
-            if (isP2PMode && isHost) p2p.send("CMD:PLAY");
-
-            // Khách bấm Play -> Xin đồng bộ lại ngay
-            if (isP2PMode && !isHost) p2p.send("CMD:REQUEST_INFO");
+            if (isP2PMode && isHost) {
+                double currentT = mediaPlayer.getCurrentTime().toSeconds();
+                p2p.send("CMD:FORCE_SYNC:" + currentT + ":PLAY");
+            }
         }
     }
 
-    // --- CÁC HÀM KHÁC (GIỮ NGUYÊN) ---
-
-    // Hàm dọn dẹp quan trọng (FIX LỖI 3)
     private void cleanupAndExit() {
         if (mediaPlayer != null) {
+            mediaPlayer.pause();
             mediaPlayer.stop();
             mediaPlayer.dispose();
+            mediaPlayer = null;
         }
-        // Đóng Socket P2P để lần sau vào lại không bị lỗi port
-        // (Lưu ý: Cần thêm hàm close() trong P2PNetwork nếu chưa có)
-        // p2p.close();
-
+        if (p2p != null) p2p.close();
+        if (syncTimer != null) syncTimer.stop();
         isP2PMode = false;
         isHost = false;
+        isMuted = false;
+        isSyncing = false;
     }
 
-    // ... (Copy lại các hàm setupConnectionLogic, setMovieToPlay, skipBack, skipForward từ bản cũ) ...
-    // Nhớ giữ nguyên logic lấy IP, kết nối Server nha!
-
-    // Code nút TẠO PHÒNG
     private void setupConnectionLogic() {
         btnCreateRoom.setOnAction(e -> {
             connectionMenu.setVisible(false);
@@ -250,51 +316,47 @@ public class PlayerController implements Initializable {
             guestPanel.setVisible(false);
             lblRoomId.setText("...");
             isHost = true;
-
             new Thread(() -> {
                 try (Socket socket = new Socket(SERVER_HOST, SERVER_PORT);
                      PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-                     BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+                     java.util.Scanner in = new java.util.Scanner(socket.getInputStream())) {
 
                     out.println("CREATE");
-                    String response = in.readLine();
-                    if (response != null && response.startsWith("CREATED")) {
-                        String code = response.split(" ")[1];
-                        Platform.runLater(() -> {
-                            lblRoomId.setText(code);
-                            chatListView.getItems().add("System: Phòng " + code + " sẵn sàng!");
-                        });
-                        p2p.startHost();
+                    if (in.hasNextLine()) {
+                        String response = in.nextLine();
+                        if (response.startsWith("CREATED")) {
+                            String code = response.split(" ")[1];
+                            Platform.runLater(() -> {
+                                lblRoomId.setText(code);
+                                if (lblMemberCount != null) lblMemberCount.setText("Online: 1");
+                                startSyncTimer();
+                            });
+                            p2p.startHost();
+                        }
                     }
-                } catch (Exception ex) { Platform.runLater(() -> lblRoomId.setText("Lỗi")); }
+                } catch (Exception ex) { Platform.runLater(() -> lblRoomId.setText("Lỗi Server")); }
             }).start();
         });
 
-        // Code nút KẾT NỐI (Khách)
         connectBtn.setOnAction(e -> {
             String code = ipField.getText().trim();
             if (code.isEmpty()) return;
             isHost = false;
-
-            chatListView.getItems().add("System: Đang kết nối...");
             new Thread(() -> {
                 try (Socket socket = new Socket(SERVER_HOST, SERVER_PORT);
                      PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-                     BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+                     java.util.Scanner in = new java.util.Scanner(socket.getInputStream())) {
 
                     out.println("JOIN " + code);
-                    String response = in.readLine();
-                    if (response != null && response.startsWith("FOUND")) {
-                        String hostIp = response.split(" ")[1];
-                        Platform.runLater(() -> chatListView.getItems().add("System: Kết nối tới Host..."));
-
-                        p2p.connect(hostIp);
-
-                        // FIX LỖI 2: Chờ 1s cho kết nối ổn định rồi mới xin data
-                        try { Thread.sleep(1000); } catch (Exception ex) {}
-                        p2p.send("CMD:REQUEST_INFO");
-
-                    } else { Platform.runLater(() -> chatListView.getItems().add("System: Không tìm thấy phòng!")); }
+                    if (in.hasNextLine()) {
+                        String response = in.nextLine();
+                        if (response.startsWith("FOUND")) {
+                            String hostIp = response.split(" ")[1];
+                            p2p.connect(hostIp, ClientSession.myUsername);
+                        } else {
+                            Platform.runLater(() -> chatListView.getItems().add("System: Không tìm thấy phòng!"));
+                        }
+                    }
                 } catch (Exception ex) { }
             }).start();
         });
@@ -304,12 +366,10 @@ public class PlayerController implements Initializable {
             hostPanel.setVisible(false);
             guestPanel.setVisible(true);
         });
-
-        btnCancelHost.setOnAction(e -> resetP2PInterface());
-        btnCancelGuest.setOnAction(e -> resetP2PInterface());
+        btnCancelHost.setOnAction(e -> backToDetailScene(e));
+        btnCancelGuest.setOnAction(e -> backToDetailScene(e));
     }
 
-    // ... (Các hàm updateTimeLabel, formatTime, setMode giữ nguyên) ...
     public void setMovieToPlay(Movie movie, boolean isP2P) {
         this.currentMovie = movie;
         this.isP2PMode = isP2P;
@@ -334,7 +394,6 @@ public class PlayerController implements Initializable {
                     if (!timeSlider.isPressed()) timeSlider.setValue(newTime.toSeconds());
                     updateTimeLabel(newTime);
                 });
-
                 mediaPlayer.setAutoPlay(false);
 
             } catch (Exception e) { System.out.println("Lỗi Video"); }
@@ -370,11 +429,13 @@ public class PlayerController implements Initializable {
     }
 
     private void resetP2PInterface() {
-        connectionMenu.setVisible(true);
-        hostPanel.setVisible(false);
-        guestPanel.setVisible(false);
-        ipField.clear();
-        isHost = false;
+        connectionMenu.setVisible(true); hostPanel.setVisible(false); guestPanel.setVisible(false);
+        ipField.clear(); isHost = false;
+        if (p2p != null) p2p.close();
+    }
+
+    private void stopVideo() {
+        if (mediaPlayer != null) { mediaPlayer.stop(); mediaPlayer.dispose(); }
     }
 
     @FXML public void skipBack() {
@@ -389,5 +450,23 @@ public class PlayerController implements Initializable {
         double t = mediaPlayer.getCurrentTime().toSeconds() + 10;
         mediaPlayer.seek(Duration.seconds(t));
         if (isP2PMode && isHost) p2p.send("CMD:SEEK:" + t);
+    }
+
+    private void backToDetailScene(javafx.event.Event event) {
+        if (isP2PMode && isHost && p2p != null) {
+            p2p.send("CMD:CLOSE_ROOM");
+        }
+        cleanupAndExit();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/detail.fxml"));
+            Parent root = loader.load();
+            if (currentMovie != null) {
+                DetailController detailController = loader.getController();
+                detailController.setMovieData(currentMovie.getId());
+            }
+            Stage window = (Stage) backBtn.getScene().getWindow();
+            window.setScene(new Scene(root));
+            window.show();
+        } catch (IOException e) { e.printStackTrace(); }
     }
 }

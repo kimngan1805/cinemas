@@ -36,6 +36,7 @@ public class LoginController {
         boolean success = ClientSession.connect(ip, 5000, name);
 
         if (success) {
+            ClientSession.myUsername = name;
             System.out.println("Đăng nhập thành công!");
             try {
                 // Chuyển sang màn hình chính (View.fxml)

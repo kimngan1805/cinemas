@@ -9,6 +9,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.media.MediaView?>
@@ -111,6 +112,10 @@
                         <HBox alignment="CENTER_LEFT" spacing="10.0" style="-fx-padding: 15; -fx-background-color: #1a1a2e;">
                             <Circle radius="5.0" fill="#e50914" />
                             <Label text="Phòng Chiếu P2P" textFill="WHITE" style="-fx-font-weight: bold;"/>
+
+                            <Region HBox.hgrow="ALWAYS" />
+
+                            <Label fx:id="lblMemberCount" text="Online: 1" textFill="#888888" style="-fx-font-size: 11px; -fx-font-style: italic;"/>
                         </HBox>
 
                         <StackPane style="-fx-background-color: #111; -fx-padding: 15; -fx-border-color: #333; -fx-border-width: 0 0 1 0;">
@@ -143,7 +148,7 @@
                             </children>
                         </StackPane>
 
-                        <ListView fx:id="chatListView" VBox.vgrow="ALWAYS" style="-fx-background-color: #15181d; -fx-control-inner-background: #15181d;"/>
+                        <ListView fx:id="chatListView" VBox.vgrow="ALWAYS" style="-fx-background-color: #15181d; -fx-control-inner-background: #15181d; -fx-border-color: transparent;"/>
 
                         <HBox spacing="10.0" style="-fx-padding: 10; -fx-background-color: #1a1a2e;">
                             <TextField fx:id="chatInput" promptText="Chat..." style="-fx-background-color: #333; -fx-text-fill: white;" HBox.hgrow="ALWAYS"/>

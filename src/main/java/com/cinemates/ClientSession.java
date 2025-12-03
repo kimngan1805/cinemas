@@ -8,7 +8,7 @@ public class ClientSession {
     private static Socket socket;
     private static PrintWriter out;
     private static String username;
-
+    public static String myUsername = "Anonymous";
     public static boolean connect(String ip, int port, String name) {
         try {
             socket = new Socket(ip, port);
