@@ -20,8 +20,7 @@
         <Label text="Tên hiển thị (Username):" textFill="WHITE" />
         <TextField fx:id="usernameField" promptText="Nhập tên của bạn..." style="-fx-background-color: #333; -fx-text-fill: white; -fx-padding: 10;" />
 
-        <Label text="Địa chỉ Server (IP):" textFill="WHITE" />
-        <TextField fx:id="serverIpField" text="127.0.0.1" promptText="IP máy chủ..." style="-fx-background-color: #333; -fx-text-fill: white; -fx-padding: 10;" />
+
 
         <Button fx:id="loginBtn" maxWidth="Infinity" style="-fx-background-color: #d45b12; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px; -fx-padding: 10; -fx-cursor: hand;" text="VÀO HỆ THỐNG" />
 

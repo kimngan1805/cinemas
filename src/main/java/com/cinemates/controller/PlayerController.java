@@ -452,21 +452,51 @@ public class PlayerController implements Initializable {
         if (isP2PMode && isHost) p2p.send("CMD:SEEK:" + t);
     }
 
+    // --- HÀM CHUNG: QUAY VỀ TRANG DETAIL (ĐÃ NÂNG CẤP) ---
     private void backToDetailScene(javafx.event.Event event) {
-        if (isP2PMode && isHost && p2p != null) {
-            p2p.send("CMD:CLOSE_ROOM");
+
+        // 1. XỬ LÝ LỜI CHÀO TẠM BIỆT TRƯỚC KHI NGẮT KẾT NỐI
+        if (isP2PMode && p2p != null) {
+
+            if (isHost) {
+                // TRƯỜNG HỢP HOST: Đuổi tất cả
+                System.out.println("Host đang giải tán phòng...");
+                p2p.send("CMD:CLOSE_ROOM");
+            }
+            else {
+                // TRƯỜNG HỢP GUEST: Báo cáo là em out nha
+                System.out.println("Khách đang rời phòng...");
+
+                // Gửi tin nhắn dạng System để hiện lên khung chat của mọi người
+                // Cấu trúc: CHAT:System:[Tên] đã rời phòng.
+                p2p.send("CHAT:" + ClientSession.myUsername + " đã rời phòng.");
+
+                // MẸO QUAN TRỌNG: Ngủ 0.2s để tin nhắn kịp bay sang máy Host
+                // Nếu không có dòng này, mạng bị cắt nhanh quá tin nhắn chưa kịp đi
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) { }
+            }
         }
+
+        // 2. Dọn dẹp sạch sẽ (Cắt mạng, tắt video)
         cleanupAndExit();
+
+        // 3. Chuyển cảnh về Detail (Code cũ giữ nguyên)
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/detail.fxml"));
             Parent root = loader.load();
+
             if (currentMovie != null) {
                 DetailController detailController = loader.getController();
                 detailController.setMovieData(currentMovie.getId());
             }
+
             Stage window = (Stage) backBtn.getScene().getWindow();
             window.setScene(new Scene(root));
             window.show();
-        } catch (IOException e) { e.printStackTrace(); }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
