@@ -1,0 +1,51 @@
+/* Container Thẻ */
+.vip-card {
+    -fx-background-color: white;
+    -fx-background-radius: 25;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 20, 0, 0, 10);
+}
+
+.vip-gradient-overlay {
+    -fx-background-color: linear-gradient(to right, rgba(40, 180, 70, 0.9), transparent);
+    -fx-background-radius: 23 23 0 0;
+}
+
+/* Style cho Nhãn và Ô nhập liệu */
+.input-label {
+    -fx-text-fill: #555555;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+.form-input {
+    -fx-background-color: #f4f4f4;
+    -fx-background-radius: 10;
+    -fx-padding: 12;
+    -fx-border-color: transparent;
+    -fx-border-radius: 10;
+    -fx-font-size: 14px;
+}
+
+.form-input:focused {
+    -fx-background-color: white;
+    -fx-border-color: #28b446; /* Hiện viền xanh khi nhấn vào */
+}
+
+/* Nút Đăng Ký */
+.btn-register-now {
+    -fx-background-color: #28b446;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+    -fx-padding: 15;
+    -fx-background-radius: 12;
+    -fx-cursor: hand;
+}
+.btn-register-now:hover { -fx-background-color: #22993c; }
+
+.btn-back-link {
+    -fx-background-color: transparent;
+    -fx-text-fill: #28b446;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}

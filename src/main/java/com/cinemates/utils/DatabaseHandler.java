@@ -110,6 +110,38 @@ public class DatabaseHandler {
         }
         return episode;
     }
+    // Thêm hàm này vào class DatabaseHandler của Ngân
+    public static boolean registerUser(String username, String email, String password) {
+        String sql = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
+        try (Connection conn = getConnection();
+             java.sql.PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, username);
+            pstmt.setString(2, email);
+            pstmt.setString(3, password); // Ngân nhớ tạo bảng users trong DB trước nha
+
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static boolean checkLogin(String username, String password) {
+        String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
+        try (Connection conn = getConnection();
+             java.sql.PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, username);
+            pstmt.setString(2, password);
+            java.sql.ResultSet rs = pstmt.executeQuery();
+
+            return rs.next(); // Nếu có kết quả trả về là đúng
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
     // HÀM MAIN ĐỂ TEST NHANH (Chạy riêng file này thôi)
     public static void main(String[] args) {
         getConnection();

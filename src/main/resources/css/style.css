@@ -1,0 +1,350 @@
+/* =========================================
+   1. DIỆT THANH CUỘN & NỀN TỔNG THỂ
+   ========================================= */
+.main-container {
+    -fx-background-color: #0f1216;
+}
+
+/* Ẩn hoàn toàn thanh cuộn (Scrollbar) */
+.main-container .scroll-bar:vertical,
+.main-container .scroll-bar:horizontal {
+    -fx-opacity: 0;
+    -fx-max-width: 0;
+    -fx-max-height: 0;
+    -fx-padding: -5;
+}
+
+.main-container .viewport {
+    -fx-background-color: #0f1216;
+}
+
+.main-bg {
+    -fx-background-color: #0f172a; /* Navy đậm hiện đại */
+}
+
+/* =========================================
+   2. HEADER & NAVIGATION
+   ========================================= */
+.header-nav {
+    -fx-background-color: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+    -fx-padding: 10 40;
+}
+
+.logo-text {
+    -fx-font-family: "System Bold";
+    -fx-font-size: 28px;
+}
+
+.nav-link {
+    -fx-background-color: transparent;
+    -fx-text-fill: #b3b3b3;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.nav-active {
+    -fx-text-fill: #00ff40; /* Màu xanh VieON */
+}
+
+.search-box {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-text-fill: white;
+    -fx-background-radius: 20;
+    -fx-padding: 8 15;
+}
+
+/* Thanh Navbar dính trên cùng */
+.sticky-header {
+    /* Màu nền đen trong suốt để thấy phim chạy bên dưới */
+    -fx-background-color: rgba(15, 23, 42, 0.9);
+    /* Đổ bóng nhẹ phía dưới thanh navbar */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 10, 0, 0, 5);
+}
+
+/* Ẩn thanh cuộn triệt để */
+.scroll-pane {
+    -fx-background-color: transparent;
+}
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+/* Các thuộc tính khác giữ nguyên của Ngân... */
+/* =========================================
+   3. NÚT BẤM (BUTTONS)
+   ========================================= */
+.btn-gold {
+    -fx-background-color: #f5c518;
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.btn-create {
+    -fx-background-color: transparent;
+    -fx-border-color: white;
+    -fx-border-radius: 5;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+}
+
+.btn-play-now {
+    -fx-background-color: white;
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
+    -fx-padding: 12 30;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.btn-detail {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+    -fx-text-fill: white;
+    -fx-padding: 12 30;
+    -fx-border-color: white;
+    -fx-border-radius: 5;
+    -fx-cursor: hand;
+}
+
+/* =========================================
+   4. HERO BANNER & MEDIA
+   ========================================= */
+.hero-overlay {
+    /* Gradient giúp chữ nổi bật trên video */
+    -fx-background-color: linear-gradient(to top, #0f172a 0%, transparent 50%),
+                          linear-gradient(to right, #0f172a 0%, transparent 60%);
+}
+
+.hero-title {
+    -fx-font-size: 50px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.hero-tagline {
+    -fx-text-fill: #00ff40;
+    -fx-font-size: 14px;
+}
+
+/* =========================================
+   5. ĐIỀU HƯỚNG GÓC PHẢI (DOTS & ARROWS)
+   ========================================= */
+/* Nút Loa bo tròn */
+.btn-volume {
+    -fx-background-color: rgba(0, 0, 0, 0.4);
+    -fx-text-fill: white;
+    -fx-background-radius: 50;
+    -fx-pref-width: 40;
+    -fx-pref-height: 40;
+    -fx-font-size: 16;
+    -fx-cursor: hand;
+    -fx-opacity: 0.7;
+}
+.btn-volume:hover {
+    -fx-opacity: 1;
+    -fx-background-color: rgba(0, 0, 0, 0.6);
+}
+
+/* Nút mũi tên điều hướng tròn */
+.btn-nav-round {
+    -fx-background-color: rgba(0, 0, 0, 0.3);
+    -fx-border-color: rgba(255, 255, 255, 0.5);
+    -fx-border-radius: 50;
+    -fx-background-radius: 50;
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-pref-width: 40px;
+    -fx-pref-height: 40px;
+    -fx-cursor: hand;
+}
+.btn-nav-round:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Thanh gạch ngang (Dots) */
+.dot-normal {
+    -fx-min-width: 12px;
+    -fx-max-width: 12px;
+    -fx-min-height: 3px;
+    -fx-max-height: 3px;
+    -fx-background-color: rgba(255, 255, 255, 0.3);
+    -fx-background-radius: 2;
+}
+
+.dot-active {
+    -fx-min-width: 30px;
+    -fx-max-width: 30px;
+    -fx-min-height: 3px;
+    -fx-max-height: 3px;
+    -fx-background-color: white;
+    -fx-background-radius: 2;
+}
+
+/* =========================================
+   6. DANH SÁCH PHIM (CONTENT ROWS)
+   ========================================= */
+.content-padding {
+    -fx-padding: 20 60;
+}
+
+.row-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.movie-item {
+    -fx-cursor: hand;
+    -fx-background-radius: 10;
+}
+
+.movie-item:hover {
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.tag-top10 {
+    -fx-background-color: #e50914;
+    -fx-text-fill: white;
+    -fx-padding: 2 8;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.tag-vip {
+    -fx-background-color: #f5c518;
+    -fx-text-fill: black;
+    -fx-padding: 2 8;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.movie-name {
+    -fx-text-fill: white;
+    -fx-padding: 10 0;
+    -fx-font-weight: bold;
+}
+/* Tiêu đề các mục phim (Ví dụ: THẾ GIỚI ANIME) */
+.section-title {
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 10 0;
+}
+
+/* Khoảng cách giữa các mục phim */
+.section-container {
+    -fx-padding: 20 0 20 60;
+}
+
+/* Tên phim nhỏ dưới poster */
+.movie-name {
+    -fx-text-fill: #e5e5e5;
+    -fx-font-size: 14px;
+    -fx-padding: 5 0 0 0;
+}
+
+/* Bo góc poster cho hiện đại */
+.movie-item ImageView {
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+}
+/* Thẻ xem trước (Preview Card) */
+.preview-card {
+    -fx-background-color: #1a1d23;
+    -fx-background-radius: 12;
+    /* Đổ bóng cực mạnh để tách lớp */
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 30, 0, 0, 15);
+}
+
+.preview-card ImageView {
+    -fx-clip: rect(0, 320, 180, 0); /* Cắt ảnh bo góc trên */
+    -fx-background-radius: 12 12 0 0;
+}
+
+.preview-title {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+}
+
+.preview-meta {
+    -fx-text-fill: #999;
+    -fx-font-size: 12px;
+}
+
+/* Nút bấm tròn trong preview */
+.btn-circle-white {
+    -fx-background-color: white;
+    -fx-background-radius: 50;
+    -fx-pref-width: 35; -fx-pref-height: 35;
+    -fx-font-size: 14;
+}
+
+.btn-circle-outline {
+    -fx-background-color: transparent;
+    -fx-border-color: #666;
+    -fx-border-radius: 50;
+    -fx-text-fill: white;
+    -fx-pref-width: 35; -fx-pref-height: 35;
+}
+.main-bg { -fx-background-color: #0f172a; }
+.scroll-pane, .scroll-pane > .viewport { -fx-background-color: transparent; }
+
+/* Sticky Navbar */
+.header-nav { -fx-background-color: rgba(15, 23, 42, 0.98); -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 10, 0, 0, 5); }
+/* =========================================
+   THẺ PREVIEW (FIX LỖI RỘNG KHÔNG BẰNG NHAU)
+   ========================================= */
+.preview-card {
+    -fx-background-color: #181818;
+    -fx-background-radius: 10;
+    /* ÉP CỨNG CHIỀU RỘNG 400PX */
+    -fx-pref-width: 400px;
+    -fx-min-width: 400px;
+    -fx-max-width: 400px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.9), 40, 0, 0, 20);
+}
+
+.preview-details-bg {
+    -fx-background-color: #181818;
+    -fx-background-radius: 0 0 10 10;
+    /* ÉP DÃN ĐỀU CHIỀU RỘNG */
+    -fx-pref-width: 400px;
+    -fx-min-width: 400px;
+    -fx-fill-width: true;
+}
+
+/* TIÊU ĐỀ PHIM (WrapText để hiện đủ chữ) */
+.preview-title-text {
+    -fx-font-size: 19px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-padding: 5 0;
+}
+
+/* CÁC NÚT BẤM (GIỐNG HÌNH NGÂN GỬI) */
+.btn-play-rect {
+    -fx-background-color: white;
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-padding: 10 18;
+    -fx-background-radius: 5;
+}
+
+.btn-action-outline {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-border-color: rgba(255, 255, 255, 0.4);
+    -fx-border-radius: 5;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-padding: 10 12;
+}
+
+/* DÒNG THÔNG TIN META */
+.preview-meta-text { -fx-text-fill: white; -fx-font-size: 12px; }
+.preview-meta-separator { -fx-text-fill: #555; -fx-font-weight: bold; }
+
+/* ... (Các phần Header, Hero, Scrollbar cũ của Ngân giữ nguyên ở trên nha) ... */

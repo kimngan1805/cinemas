@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.media.MediaView?>
+<?import javafx.scene.text.Font?>
+
+<StackPane prefHeight="800.0" prefWidth="1280.0" styleClass="main-container" stylesheets="@/css/style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cinemates.controller.HomeController">
+    <children>
+
+        <ScrollPane fx:id="mainScrollPane" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="NEVER">
+            <content>
+                <VBox styleClass="main-bg">
+                    <children>
+                        <Region prefHeight="70.0" />
+                        <StackPane prefHeight="550.0">
+                            <children>
+                                <MediaView fx:id="mainMediaView" fitHeight="550.0" fitWidth="1280.0" preserveRatio="false" />
+                                <Region styleClass="hero-overlay" />
+                                <VBox alignment="BOTTOM_LEFT" spacing="15.0">
+                                    <children>
+                                        <Label fx:id="lblMovieTitle" styleClass="hero-title" text="MƠ NGỐ KHEN NGON" textFill="WHITE" />
+                                        <Label fx:id="lblMovieSubtitle" styleClass="hero-tagline" text="Phim cổ trang • Phim tình cảm • 🏆 #4 hôm nay" textFill="#cccccc" />
+                                        <HBox spacing="15.0">
+                                            <children>
+                                                <Button styleClass="btn-play-now" text="▶ Xem ngay" />
+                                                <Button styleClass="btn-detail" text="ⓘ Chi tiết" />
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                    <padding><Insets bottom="60.0" left="60.0" /></padding>
+                                </VBox>
+                                <VBox alignment="BOTTOM_RIGHT" spacing="20.0" StackPane.alignment="BOTTOM_RIGHT">
+                                    <children>
+                                        <Button fx:id="btnVolume" onAction="#handleToggleMute" styleClass="btn-volume" text="🔊" />
+                                        <HBox alignment="CENTER_RIGHT" spacing="20.0">
+                                            <children>
+                                                <HBox fx:id="dotsContainer" alignment="CENTER" fillHeight="false" spacing="8.0" />
+                                                <HBox spacing="10.0">
+                                                    <children>
+                                                        <Button onAction="#handlePrevHero" styleClass="btn-nav-round" text="‹" />
+                                                        <Button onAction="#handleNextHero" styleClass="btn-nav-round" text="›" />
+                                                    </children>
+                                                </HBox>
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                    <padding><Insets bottom="60.0" right="60.0" /></padding>
+                                </VBox>
+                            </children>
+                        </StackPane>
+
+                        <VBox spacing="30.0" styleClass="content-padding">
+                            <children>
+                                <VBox spacing="15.0">
+                                    <children>
+                                        <Label styleClass="section-title" text="THỊNH HÀNH" textFill="WHITE" />
+                                        <HBox spacing="15.0">
+                                            <children>
+                                                <VBox fx:id="movie1" styleClass="movie-item">
+                                                    <StackPane>
+                                                        <ImageView fitHeight="170.0" fitWidth="290.0" pickOnBounds="true"><image><Image url="@/image/background.png" /></image></ImageView>
+                                                        <Label styleClass="tag-top10" StackPane.alignment="TOP_RIGHT" text="TOP 10" />
+                                                    </StackPane>
+                                                    <Label styleClass="movie-name" text="Phim của Ngân" />
+                                                </VBox>
+                                                <VBox fx:id="movie2" styleClass="movie-item"><ImageView fitHeight="170.0" fitWidth="290.0" pickOnBounds="true"><image><Image url="@/image/background.png" /></image></ImageView><Label styleClass="movie-name" text="Ẩn Danh 3" /></VBox>
+                                                <VBox fx:id="movie3" styleClass="movie-item"><ImageView fitHeight="170.0" fitWidth="290.0" pickOnBounds="true"><image><Image url="@/image/background.png" /></image></ImageView><Label styleClass="movie-name" text="Conan: Cơn Ác Mộng" /></VBox>
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                </VBox>
+                            </children>
+                            <padding><Insets bottom="100.0" left="60.0" top="20.0" /></padding>
+                        </VBox>
+                    </children>
+                </VBox>
+            </content>
+        </ScrollPane>
+
+        <HBox alignment="CENTER_LEFT" maxHeight="70.0" prefHeight="70.0" spacing="20.0" styleClass="header-nav" StackPane.alignment="TOP_CENTER">
+            <children>
+                <Label styleClass="logo-text" text="VieON" textFill="#00ff40" />
+                <HBox alignment="CENTER_LEFT" spacing="20.0" HBox.hgrow="ALWAYS">
+                    <children>
+                        <Button styleClass="nav-link, nav-active" text="Trang chủ" />
+                        <Button styleClass="nav-link" text="Kho Phim" />
+                    </children>
+                </HBox>
+                <HBox alignment="CENTER_RIGHT" spacing="15.0">
+                    <children>
+                        <Button fx:id="btnCreateRoom" styleClass="btn-create" text="TẠO PHÒNG" />
+                        <Button fx:id="btnRegister" onAction="#handleOpenRegister" styleClass="btn-gold" text="ĐĂNG KÝ VIP" />
+                        <Label fx:id="lblUserSession" managed="false" text="User" textFill="#00ff40" visible="false">
+                            <font><Font name="System Bold" size="14.0" /></font>
+                        </Label>
+                        <TextField promptText="Tìm phim..." styleClass="search-box" />
+                        <Button onAction="#handleToggleFriendSidebar" styleClass="user-icon-btn" text="👤" />
+                    </children>
+                </HBox>
+            </children>
+            <padding><Insets left="40.0" right="40.0" /></padding>
+        </HBox>
+
+        <VBox fx:id="previewCard" managed="false" visible="false" prefWidth="400.0" styleClass="preview-card" StackPane.alignment="TOP_LEFT">
+            <children>
+                <StackPane prefHeight="220.0" prefWidth="400.0">
+                    <children>
+                        <ImageView fx:id="previewImage" fitHeight="220.0" fitWidth="400.0" pickOnBounds="true" />
+                        <MediaView fx:id="previewMediaView" fitHeight="220.0" fitWidth="400.0" preserveRatio="false" />
+                        <Button fx:id="btnPreviewMute" onAction="#handleTogglePreviewMute" styleClass="btn-volume-mini" text="🔇" StackPane.alignment="BOTTOM_RIGHT">
+                            <StackPane.margin><Insets bottom="10.0" right="10.0" /></StackPane.margin>
+                        </Button>
+                    </children>
+                </StackPane>
+                <VBox spacing="15.0" styleClass="preview-details-bg">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <children>
+                                <Button styleClass="btn-play-rect" text="▶ Xem ngay" />
+                                <Button styleClass="btn-action-outline" text="+ Danh sách" />
+                                <Region HBox.hgrow="ALWAYS" />
+                                <Button styleClass="btn-action-outline" text="ⓘ Chi tiết" />
+                            </children>
+                        </HBox>
+                        <Label fx:id="lblPreviewTitle" styleClass="preview-title-text" text="PHIM CỦA NGÂN" wrapText="true" maxWidth="370.0" />
+                        <HBox spacing="8.0">
+                            <children>
+                                <Label styleClass="preview-meta-text" text="2022" />
+                                <Label styleClass="preview-meta-separator" text="|" />
+                                <Label styleClass="preview-meta-text" text="T13" />
+                                <Label styleClass="preview-meta-separator" text="|" />
+                                <Label styleClass="preview-meta-text" text="Hồng Kông" />
+                                <Label styleClass="preview-meta-separator" text="|" />
+                                <Label styleClass="preview-meta-text" text="Full HD" />
+                            </children>
+                        </HBox>
+                    </children>
+                    <padding><Insets bottom="20.0" left="15.0" right="15.0" top="15.0" /></padding>
+                </VBox>
+            </children>
+        </VBox>
+
+        <VBox fx:id="friendSidebar" managed="false" visible="false" maxWidth="300.0" prefWidth="300.0" styleClass="friend-sidebar" StackPane.alignment="TOP_RIGHT">
+            <children>
+                <Label styleClass="sidebar-title" text="BẠN BÈ" />
+                <HBox spacing="10.0" styleClass="search-friend-container">
+                    <children>
+                        <TextField fx:id="txtSearchFriend" promptText="Tìm bạn..." styleClass="search-box-mini" HBox.hgrow="ALWAYS" />
+                        <Button onAction="#handleAddFriend" styleClass="btn-add-friend" text="+" />
+                    </children>
+                    <VBox.margin><Insets bottom="20.0" /></VBox.margin>
+                </HBox>
+                <ScrollPane fitToWidth="true" styleClass="friend-scroll" VBox.vgrow="ALWAYS">
+                    <content>
+                        <VBox fx:id="vboxFriendList" spacing="15.0" />
+                    </content>
+                </ScrollPane>
+            </children>
+            <StackPane.margin><Insets top="70.0" /></StackPane.margin>
+        </VBox>
+
+    </children>
+</StackPane>
