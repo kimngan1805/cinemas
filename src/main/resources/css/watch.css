@@ -1,0 +1,39 @@
+/* Thanh công cụ nổi */
+.meet-control-bar {
+    -fx-background-color: #202124;
+    -fx-background-radius: 40;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 5);
+}
+
+.btn-meet-icon {
+    -fx-background-color: #3c4043;
+    -fx-text-fill: white;
+    -fx-background-radius: 50;
+    -fx-min-width: 45; -fx-min-height: 45;
+}
+
+.btn-meet-leave {
+    -fx-background-color: #ea4335; /* Màu đỏ nút rời cuộc họp */
+    -fx-text-fill: white;
+    -fx-background-radius: 40;
+    -fx-min-width: 60;
+}
+
+/* Sidebar & Chat */
+.meet-sidebar {
+    -fx-background-color: #ffffff; /* Hoặc #202124 nếu muốn Dark Mode hoàn toàn */
+    -fx-border-color: #ddd;
+    -fx-border-width: 0 0 0 1;
+}
+
+.meet-input {
+    -fx-background-color: #f1f3f4;
+    -fx-background-radius: 20;
+    -fx-padding: 8 15;
+}
+
+.chat-bubble-me {
+    -fx-background-color: #e8f0fe;
+    -fx-padding: 10;
+    -fx-background-radius: 10 0 10 10;
+}

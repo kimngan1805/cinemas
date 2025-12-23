@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<StackPane fx:id="mainStackPane" prefHeight="800.0" prefWidth="1280.0" style="-fx-background-color: #0f172a;" stylesheets="@/css/detail.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cinemates.controller.MovieDetailController">
+    <children>
+        <ScrollPane fitToWidth="true" styleClass="detail-scroll">
+            <content>
+                <VBox spacing="40.0" styleClass="detail-container">
+                    <padding><Insets bottom="100.0" left="60.0" right="60.0" top="40.0" /></padding>
+                    <children>
+                        <HBox spacing="10.0" styleClass="breadcrumb-box">
+                            <children>
+                                <Button onAction="#handleBackToHome" styleClass="btn-back-icon" text="🏠" />
+                                <Label text="Cinemates / Phim Bộ /" textFill="#999" />
+                                <Label fx:id="lblBreadcrumbName" text="Phong Dữ Triều" textFill="WHITE" />
+                            </children>
+                        </HBox>
+
+                        <HBox spacing="50.0">
+                            <children>
+                                <VBox maxWidth="350.0" spacing="20.0">
+                                    <children>
+                                        <ImageView fx:id="imgPoster" fitHeight="480.0" fitWidth="330.0" pickOnBounds="true" styleClass="poster-main">
+                                            <image><Image url="@/image/background.png" /></image>
+                                        </ImageView>
+                                        <VBox spacing="10.0">
+                                            <children>
+                                                <Label fx:id="lblTitle" text="PHONG DỮ TRIỀU" textFill="WHITE"><font><Font name="System Bold" size="32.0" /></font></Label>
+                                                <HBox spacing="10.0"><children><Label styleClass="tag-imdb" text="IMDb 0" /><Label styleClass="tag-gray" text="2025" /></children></HBox>
+                                                <Label text="Giới thiệu:" textFill="WHITE" style="-fx-font-weight: bold;" />
+                                                <Label text="Hà Nhược Hiền, Phùng Bách Xuyên và anh em họ Thẩm cùng nhau vượt qua những khó khăn..." textFill="#bbb" wrapText="true" />
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </VBox>
+
+                                <VBox spacing="30.0" HBox.hgrow="ALWAYS">
+                                    <children>
+                                        <HBox spacing="20.0">
+                                            <children>
+                                                <Button styleClass="btn-play-detail" text="▶ Xem Ngay" />
+                                                <Button onAction="#handleOpenCreateRoom" styleClass="btn-room-detail" text="👥 Tạo phòng" />
+                                            </children>
+                                        </HBox>
+
+                                        <HBox spacing="30.0" styleClass="tab-bar">
+                                            <children>
+                                                <Button fx:id="btnTabEpisodes" onAction="#handleTabSwitch" styleClass="tab-btn, tab-active" text="Tập phim" />
+                                                <Button fx:id="btnTabRecommended" onAction="#handleTabSwitch" styleClass="tab-btn" text="Đề xuất" />
+                                                <Button fx:id="btnTabReviews" onAction="#handleTabSwitch" styleClass="tab-btn" text="Đánh giá" />
+                                            </children>
+                                        </HBox>
+
+                                        <StackPane>
+                                            <children>
+                                                <VBox fx:id="containerEpisodes" spacing="15.0">
+                                                    <children>
+                                                        <Label text="Vietsub" textFill="WHITE"><font><Font name="System Bold" size="18.0" /></font></Label>
+                                                        <FlowPane fx:id="flowEpisodes" hgap="12.0" vgap="12.0" />
+                                                    </children>
+                                                </VBox>
+                                                <VBox fx:id="containerRecommended" managed="false" spacing="20.0" visible="false">
+                                                    <children><Label text="PHIM TƯƠNG TỰ" textFill="WHITE" /><FlowPane fx:id="flowRecommended" hgap="20.0" vgap="25.0" /></children>
+                                                </VBox>
+                                                <VBox fx:id="containerReviews" managed="false" spacing="25.0" visible="false">
+                                                    <children>
+                                                        <VBox spacing="10.0" styleClass="review-input-box">
+                                                            <children><Label text="Viết đánh giá" textFill="WHITE" /><TextArea fx:id="txtReviewInput" prefHeight="80.0" styleClass="review-textarea" /><Button styleClass="btn-play-detail" text="Gửi" /></children>
+                                                        </VBox>
+                                                        <VBox fx:id="vboxReviewList" spacing="20.0" />
+                                                    </children>
+                                                </VBox>
+                                            </children>
+                                        </StackPane>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </content>
+        </ScrollPane>
+
+        <StackPane fx:id="createRoomOverlay" managed="false" visible="false" style="-fx-background-color: rgba(0,0,0,0.85);">
+            <children>
+                <VBox maxHeight="550.0" maxWidth="600.0" spacing="20.0" styleClass="create-room-card">
+                    <children>
+                        <HBox alignment="CENTER_LEFT">
+                            <children>
+                                <VBox spacing="5.0">
+                                    <children>
+                                        <Label styleClass="sidebar-title" text="MỜI BẠN XEM CHUNG" />
+                                        <Label fx:id="lblSelectedMovie" text="PHONG DỮ TRIỀU" textFill="#00ff40">
+                                            <font><Font name="System Bold" size="18.0" /></font>
+                                        </Label>
+                                    </children>
+                                </VBox>
+                                <Region HBox.hgrow="ALWAYS" />
+                                <Button onAction="#handleCloseCreateRoom" styleClass="btn-close-modal" text="✕" />
+                            </children>
+                        </HBox>
+                        <ScrollPane fitToWidth="true" styleClass="friend-scroll-grid" VBox.vgrow="ALWAYS">
+                            <content><FlowPane fx:id="flowFriendSelection" hgap="20.0" vgap="25.0" /></content>
+                        </ScrollPane>
+                        <Button maxWidth="Infinity" onAction="#handleStartWatchingWithFriends" styleClass="btn-register-now" text="BẮT ĐẦU XEM" />
+                    </children>
+                    <padding><Insets bottom="30.0" left="30.0" right="30.0" top="25.0" /></padding>
+                </VBox>
+            </children>
+        </StackPane>
+    </children>
+</StackPane>
