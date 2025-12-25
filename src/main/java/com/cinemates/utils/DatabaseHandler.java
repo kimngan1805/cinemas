@@ -1,149 +1,176 @@
-package com.cinemates.utils; // Nhớ dòng package này phải đúng nha
+package com.cinemates.utils;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import com.cinemates.model.Movie;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import com.cinemates.model.Movie;
 import com.cinemates.model.Episode;
+import com.cinemates.model.User; // Đảm bảo Ngân đã có Model User nha
+
 public class DatabaseHandler {
 
-    // Cấu hình cho MAMP (Port mặc định thường là 8889)
-    // Nếu Ngân dùng XAMPP thì đổi 8889 thành 3306
     private static final String DB_URL = "jdbc:mysql://localhost:8889/cinemates_db";
     private static final String USER = "root";
-    private static final String PASS = "root"; // Mật khẩu mặc định MAMP là root
+    private static final String PASS = "root";
 
-    // Hàm lấy kết nối
     public static Connection getConnection() {
         Connection conn = null;
         try {
-            // Load Driver (Bắt buộc với mấy bản Java mới)
             Class.forName("com.mysql.cj.jdbc.Driver");
-
-            // Mở kết nối
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             System.out.println("✅ Kết nối Database thành công!");
-
-        } catch (ClassNotFoundException e) {
-            System.out.println("❌ Lỗi: Không tìm thấy thư viện MySQL JDBC Driver.");
-            e.printStackTrace();
-        } catch (SQLException e) {
-            System.out.println("❌ Lỗi: Không thể kết nối đến MySQL.");
-            System.out.println("👉 Kiểm tra lại: MAMP đã bật chưa? Tên DB đúng chưa? Port 8889 hay 3306?");
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return conn;
     }
+
+    // --- LOGIC ĐĂNG NHẬP & TRẠNG THÁI ---
+
+    // Cập nhật: Trả về ID người dùng để mình biết ai đang online
+    public static int checkLogin(String username, String password) {
+        String sql = "SELECT id FROM users WHERE username = ? AND password = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, username);
+            pstmt.setString(2, password);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                int userId = rs.getInt("id");
+                updateOnlineStatus(userId, true); // Đăng nhập xong là Online ngay!
+                return userId;
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return -1;
+    }
+
+    public static void updateOnlineStatus(int userId, boolean status) {
+        String sql = "UPDATE users SET is_online = ? WHERE id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setBoolean(1, status);
+            pstmt.setInt(2, userId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) { e.printStackTrace(); }
+    }
+
+    // --- LOGIC KẾT BẠN (FRIENDSHIP) ---
+
+    // 1. Lấy danh sách bạn bè đã đồng ý
+    public static List<User> getFriendsList(int userId) {
+        List<User> friends = new ArrayList<>();
+        String sql = "SELECT u.id, u.username FROM users u " +
+                "JOIN friendships f ON (u.id = f.sender_id OR u.id = f.receiver_id) " +
+                "WHERE (f.sender_id = ? OR f.receiver_id = ?) " +
+                "AND f.status = 'ACCEPTED' AND u.id != ?";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, userId);
+            pstmt.setInt(2, userId);
+            pstmt.setInt(3, userId);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                friends.add(new User(rs.getInt("id"), rs.getString("username"), true));
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return friends;
+    }
+
+    // 2. Lấy danh sách người lạ đang online (để "thả thính")
+    public static List<User> getOnlineStrangers(int userId) {
+        List<User> strangers = new ArrayList<>();
+        String sql = "SELECT id, username FROM users WHERE is_online = TRUE AND id != ? " +
+                "AND id NOT IN (SELECT sender_id FROM friendships WHERE receiver_id = ?) " +
+                "AND id NOT IN (SELECT receiver_id FROM friendships WHERE sender_id = ?)";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, userId);
+            pstmt.setInt(2, userId);
+            pstmt.setInt(3, userId);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                strangers.add(new User(rs.getInt("id"), rs.getString("username"), true));
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return strangers;
+    }
+
+    // 3. Gửi lời mời kết bạn
+    public static boolean sendFriendRequest(int senderId, int receiverId) {
+        String sql = "INSERT INTO friendships (sender_id, receiver_id, status) VALUES (?, ?, 'PENDING')";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, senderId);
+            pstmt.setInt(2, receiverId);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) { return false; }
+    }
+
+    // 4. Đồng ý hoặc Từ chối lời mời (Dùng cho cái Popup của Ngân)
+    public static boolean handleFriendRequest(int senderId, int receiverId, String status) {
+        String sql = "UPDATE friendships SET status = ? WHERE sender_id = ? AND receiver_id = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, status); // 'ACCEPTED' hoặc 'REJECTED'
+            pstmt.setInt(2, senderId);
+            pstmt.setInt(3, receiverId);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) { return false; }
+    }
+
+    // --- CÁC HÀM CŨ (GIỮ NGUYÊN) ---
     public static List<Movie> getRecentlyAddedMovies() {
         List<Movie> list = new ArrayList<>();
-        // Lấy id, title, poster_url của những phim mới nhất
         String sql = "SELECT id, title, poster_url FROM movies ORDER BY id DESC LIMIT 10";
-
-        try (Connection conn = getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-
-            while (rs.next()) {
-                list.add(new Movie(
-                        rs.getInt("id"),
-                        rs.getString("title"),
-                        rs.getString("poster_url")
-                ));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        try (Connection conn = getConnection(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) { list.add(new Movie(rs.getInt("id"), rs.getString("title"), rs.getString("poster_url"))); }
+        } catch (Exception e) { e.printStackTrace(); }
         return list;
     }
+
     public static Movie getMovieById(int movieId) {
         Movie movie = null;
         String sql = "SELECT * FROM movies WHERE id = ?";
-
-        try (Connection conn = getConnection();
-             java.sql.PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
+        try (Connection conn = getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, movieId);
             ResultSet rs = pstmt.executeQuery();
-
-            if (rs.next()) {
-                movie = new Movie(
-                        rs.getInt("id"),
-                        rs.getString("title"),
-                        rs.getString("poster_url"),
-                        rs.getString("description"),
-                        rs.getString("genre"),
-                        rs.getString("nation"),
-                        rs.getString("duration")
-                );
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            if (rs.next()) { movie = new Movie(rs.getInt("id"), rs.getString("title"), rs.getString("poster_url"), rs.getString("description"), rs.getString("genre"), rs.getString("nation"), rs.getString("duration")); }
+        } catch (Exception e) { e.printStackTrace(); }
         return movie;
     }
+
     public static Episode getFirstEpisode(int movieId) {
         Episode episode = null;
-        // Lấy tập có episode_no = 1 hoặc tập đầu tiên tìm thấy
         String sql = "SELECT * FROM episodes WHERE movie_id = ? ORDER BY episode_no ASC LIMIT 1";
-
-        try (Connection conn = getConnection();
-             java.sql.PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
+        try (Connection conn = getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, movieId);
             ResultSet rs = pstmt.executeQuery();
-
-            if (rs.next()) {
-                episode = new Episode(
-                        rs.getInt("id"),
-                        rs.getInt("movie_id"),
-                        rs.getInt("episode_no"),
-                        rs.getString("video_id"),
-                        rs.getString("title")
-                );
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            if (rs.next()) { episode = new Episode(rs.getInt("id"), rs.getInt("movie_id"), rs.getInt("episode_no"), rs.getString("video_id"), rs.getString("title")); }
+        } catch (Exception e) { e.printStackTrace(); }
         return episode;
     }
-    // Thêm hàm này vào class DatabaseHandler của Ngân
+
+    // Thêm vào DatabaseHandler.java
+    public static List<User> getPendingRequests(int receiverId) {
+        List<User> requests = new ArrayList<>();
+        String sql = "SELECT u.id, u.username FROM users u " +
+                "JOIN friendships f ON u.id = f.sender_id " +
+                "WHERE f.receiver_id = ? AND f.status = 'PENDING'";
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, receiverId);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                requests.add(new User(rs.getInt("id"), rs.getString("username"), true));
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return requests;
+    }
     public static boolean registerUser(String username, String email, String password) {
         String sql = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
-        try (Connection conn = getConnection();
-             java.sql.PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setString(1, username);
-            pstmt.setString(2, email);
-            pstmt.setString(3, password); // Ngân nhớ tạo bảng users trong DB trước nha
-
+        try (Connection conn = getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, username); pstmt.setString(2, email); pstmt.setString(3, password);
             return pstmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public static boolean checkLogin(String username, String password) {
-        String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
-        try (Connection conn = getConnection();
-             java.sql.PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setString(1, username);
-            pstmt.setString(2, password);
-            java.sql.ResultSet rs = pstmt.executeQuery();
-
-            return rs.next(); // Nếu có kết quả trả về là đúng
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-    // HÀM MAIN ĐỂ TEST NHANH (Chạy riêng file này thôi)
-    public static void main(String[] args) {
-        getConnection();
+        } catch (SQLException e) { e.printStackTrace(); return false; }
     }
 }

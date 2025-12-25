@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class MovieDetailController implements Initializable {
-
     @FXML private FlowPane flowEpisodes, flowRecommended, flowFriendSelection;
     @FXML private VBox containerEpisodes, containerRecommended, containerReviews, vboxReviewList;
     @FXML private Button btnTabEpisodes, btnTabRecommended, btnTabReviews;
@@ -33,7 +32,6 @@ public class MovieDetailController implements Initializable {
         loadSampleReviews();
     }
 
-    // --- CHUYỂN TAB (GIỮ NGUYÊN) ---
     @FXML
     private void handleTabSwitch(ActionEvent event) {
         Button clickedBtn = (Button) event.getSource();
@@ -50,13 +48,12 @@ public class MovieDetailController implements Initializable {
         clickedBtn.getStyleClass().add("tab-active");
     }
 
-    // --- LOGIC TẠO PHÒNG ---
     @FXML
     private void handleOpenCreateRoom() {
         lblSelectedMovie.setText(lblTitle.getText().toUpperCase());
         createRoomOverlay.setVisible(true);
         createRoomOverlay.setManaged(true);
-        createRoomOverlay.toFront(); // Hiện đè lên
+        createRoomOverlay.toFront();
         loadFriendsToSelection();
     }
 
@@ -69,12 +66,10 @@ public class MovieDetailController implements Initializable {
             VBox card = new VBox(10);
             card.getStyleClass().add("friend-select-item");
             card.setAlignment(javafx.geometry.Pos.CENTER);
-
             Label avatar = new Label(name.substring(0, 1).toUpperCase());
             avatar.getStyleClass().add("avatar-circle-green");
             Label lblName = new Label(name);
             lblName.setStyle("-fx-text-fill: white; -fx-font-weight: bold;");
-
             card.getChildren().addAll(avatar, lblName);
 
             card.setOnMouseClicked(e -> {
@@ -90,21 +85,14 @@ public class MovieDetailController implements Initializable {
         }
     }
 
-    @FXML
-    private void handleCloseCreateRoom() {
-        createRoomOverlay.setVisible(false);
-        createRoomOverlay.setManaged(false);
-    }
+    @FXML private void handleCloseCreateRoom() { createRoomOverlay.setVisible(false); createRoomOverlay.setManaged(false); }
 
     @FXML
     private void handleStartWatchingWithFriends(ActionEvent event) throws IOException {
-        System.out.println("🎥 Bắt đầu phòng P2P cho phim: " + lblTitle.getText());
-        System.out.println("👥 Bạn bè cùng xem: " + selectedFriends);
-
-        // Chuyển trang sang WatchRoom và truyền dữ liệu
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/WatchRoom.fxml"));
         Parent root = loader.load();
 
+        // TRUYỀN DỮ LIỆU SANG WATCH ROOM
         WatchRoomController controller = loader.getController();
         controller.initRoomData(lblTitle.getText(), selectedFriends);
 
@@ -113,10 +101,8 @@ public class MovieDetailController implements Initializable {
         stage.show();
     }
 
-    // --- CÁC HÀM PHỤ TRỢ (GIỮ NGUYÊN) ---
-    private void loadEpisodes(int total) { flowEpisodes.getChildren().clear(); for (int i = 1; i <= total; i++) { Button btn = new Button("▶ Tập " + i); btn.getStyleClass().add("btn-episode"); if (i == 25) btn.getStyleClass().add("btn-episode-active"); flowEpisodes.getChildren().add(btn); } }
-    private void loadRecommended() { flowRecommended.getChildren().clear(); String[] movies = {"Trường Nguyệt Tẫn Minh", "Dữ Phượng Hành", "Khánh Dư Niên 2"}; for (String m : movies) { VBox card = new VBox(10); Region img = new Region(); img.setPrefSize(180, 260); img.setStyle("-fx-background-color: #2d2f34; -fx-background-radius: 10;"); card.getChildren().addAll(img, new Label(m)); flowRecommended.getChildren().add(card); } }
-    private void loadSampleReviews() { vboxReviewList.getChildren().addAll(createReviewUI("Kim Ngân", "⭐⭐⭐⭐⭐", "Hay lắm!"), createReviewUI("Chồng Ngân", "⭐⭐⭐⭐⭐", "Giao diện mượt!")); }
-    private VBox createReviewUI(String u, String s, String c) { VBox b = new VBox(5); b.setStyle("-fx-background-color: rgba(255,255,255,0.05); -fx-padding: 15; -fx-background-radius: 10;"); b.getChildren().addAll(new Label(u + " • " + s), new Label(c)); return b; }
+    private void loadEpisodes(int total) { flowEpisodes.getChildren().clear(); for (int i = 1; i <= total; i++) { Button btn = new Button("▶ Tập " + i); btn.getStyleClass().add("btn-episode"); flowEpisodes.getChildren().add(btn); } }
+    private void loadRecommended() { flowRecommended.getChildren().clear(); String[] movies = {"Trường Nguyệt Tẫn Minh", "Dữ Phượng Hành"}; for (String m : movies) { VBox card = new VBox(10); Region img = new Region(); img.setPrefSize(180, 260); img.setStyle("-fx-background-color: #2d2f34;"); card.getChildren().addAll(img, new Label(m)); flowRecommended.getChildren().add(card); } }
+    private void loadSampleReviews() { vboxReviewList.getChildren().addAll(new Label("Kim Ngân: Hay quá!"), new Label("Hằng: Giao diện xịn!")); }
     @FXML private void handleBackToHome(ActionEvent event) throws IOException { Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow(); stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("/Home.fxml")))); }
 }
