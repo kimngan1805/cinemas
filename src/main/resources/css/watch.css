@@ -37,3 +37,6 @@
     -fx-padding: 10;
     -fx-background-radius: 10 0 10 10;
 }
+.video-slider {
+    -fx-cursor: hand;
+}

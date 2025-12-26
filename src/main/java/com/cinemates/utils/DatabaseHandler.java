@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.cinemates.model.Movie;
 import com.cinemates.model.Episode;
-import com.cinemates.model.User; // Đảm bảo Ngân đã có Model User nha
+import com.cinemates.model.User;
 
 public class DatabaseHandler {
 
@@ -27,7 +27,6 @@ public class DatabaseHandler {
 
     // --- LOGIC ĐĂNG NHẬP & TRẠNG THÁI ---
 
-    // Cập nhật: Trả về ID người dùng để mình biết ai đang online
     public static int checkLogin(String username, String password) {
         String sql = "SELECT id FROM users WHERE username = ? AND password = ?";
         try (Connection conn = getConnection();
@@ -37,7 +36,7 @@ public class DatabaseHandler {
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 int userId = rs.getInt("id");
-                updateOnlineStatus(userId, true); // Đăng nhập xong là Online ngay!
+                updateOnlineStatus(userId, true);
                 return userId;
             }
         } catch (SQLException e) { e.printStackTrace(); }
@@ -56,10 +55,11 @@ public class DatabaseHandler {
 
     // --- LOGIC KẾT BẠN (FRIENDSHIP) ---
 
-    // 1. Lấy danh sách bạn bè đã đồng ý
+    // 1. SỬA TẠI ĐÂY: Lấy trạng thái online thật của bạn bè
     public static List<User> getFriendsList(int userId) {
         List<User> friends = new ArrayList<>();
-        String sql = "SELECT u.id, u.username FROM users u " +
+        // Đã thêm u.is_online vào câu lệnh SELECT
+        String sql = "SELECT u.id, u.username, u.is_online FROM users u " +
                 "JOIN friendships f ON (u.id = f.sender_id OR u.id = f.receiver_id) " +
                 "WHERE (f.sender_id = ? OR f.receiver_id = ?) " +
                 "AND f.status = 'ACCEPTED' AND u.id != ?";
@@ -70,16 +70,18 @@ public class DatabaseHandler {
             pstmt.setInt(3, userId);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
-                friends.add(new User(rs.getInt("id"), rs.getString("username"), true));
+                // SỬA: Thay 'true' bằng rs.getBoolean("is_online")
+                friends.add(new User(rs.getInt("id"), rs.getString("username"), rs.getBoolean("is_online")));
             }
         } catch (SQLException e) { e.printStackTrace(); }
         return friends;
     }
 
-    // 2. Lấy danh sách người lạ đang online (để "thả thính")
+    // 2. SỬA TẠI ĐÂY: Lấy trạng thái online của người lạ
     public static List<User> getOnlineStrangers(int userId) {
         List<User> strangers = new ArrayList<>();
-        String sql = "SELECT id, username FROM users WHERE is_online = TRUE AND id != ? " +
+        // Đã thêm is_online vào câu lệnh SELECT
+        String sql = "SELECT id, username, is_online FROM users WHERE is_online = TRUE AND id != ? " +
                 "AND id NOT IN (SELECT sender_id FROM friendships WHERE receiver_id = ?) " +
                 "AND id NOT IN (SELECT receiver_id FROM friendships WHERE sender_id = ?)";
         try (Connection conn = getConnection();
@@ -89,13 +91,13 @@ public class DatabaseHandler {
             pstmt.setInt(3, userId);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
-                strangers.add(new User(rs.getInt("id"), rs.getString("username"), true));
+                // SỬA: Lấy đúng trạng thái từ DB
+                strangers.add(new User(rs.getInt("id"), rs.getString("username"), rs.getBoolean("is_online")));
             }
         } catch (SQLException e) { e.printStackTrace(); }
         return strangers;
     }
 
-    // 3. Gửi lời mời kết bạn
     public static boolean sendFriendRequest(int senderId, int receiverId) {
         String sql = "INSERT INTO friendships (sender_id, receiver_id, status) VALUES (?, ?, 'PENDING')";
         try (Connection conn = getConnection();
@@ -106,12 +108,11 @@ public class DatabaseHandler {
         } catch (SQLException e) { return false; }
     }
 
-    // 4. Đồng ý hoặc Từ chối lời mời (Dùng cho cái Popup của Ngân)
     public static boolean handleFriendRequest(int senderId, int receiverId, String status) {
         String sql = "UPDATE friendships SET status = ? WHERE sender_id = ? AND receiver_id = ?";
         try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, status); // 'ACCEPTED' hoặc 'REJECTED'
+            pstmt.setString(1, status);
             pstmt.setInt(2, senderId);
             pstmt.setInt(3, receiverId);
             return pstmt.executeUpdate() > 0;
@@ -150,10 +151,11 @@ public class DatabaseHandler {
         return episode;
     }
 
-    // Thêm vào DatabaseHandler.java
+    // 3. SỬA TẠI ĐÂY: Lấy trạng thái online của người gửi yêu cầu kết bạn
     public static List<User> getPendingRequests(int receiverId) {
         List<User> requests = new ArrayList<>();
-        String sql = "SELECT u.id, u.username FROM users u " +
+        // Đã thêm u.is_online vào câu lệnh SELECT
+        String sql = "SELECT u.id, u.username, u.is_online FROM users u " +
                 "JOIN friendships f ON u.id = f.sender_id " +
                 "WHERE f.receiver_id = ? AND f.status = 'PENDING'";
         try (Connection conn = getConnection();
@@ -161,16 +163,26 @@ public class DatabaseHandler {
             pstmt.setInt(1, receiverId);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
-                requests.add(new User(rs.getInt("id"), rs.getString("username"), true));
+                // SỬA: Lấy đúng trạng thái từ DB
+                requests.add(new User(rs.getInt("id"), rs.getString("username"), rs.getBoolean("is_online")));
             }
         } catch (SQLException e) { e.printStackTrace(); }
         return requests;
     }
+
     public static boolean registerUser(String username, String email, String password) {
         String sql = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
         try (Connection conn = getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, username); pstmt.setString(2, email); pstmt.setString(3, password);
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) { e.printStackTrace(); return false; }
+    }
+
+    public static void resetAllUsersToOffline() {
+        String sql = "UPDATE users SET is_online = FALSE";
+        try (Connection conn = getConnection(); Statement stmt = conn.createStatement()) {
+            stmt.executeUpdate(sql);
+            System.out.println("🧹 Đã dọn dẹp: Tất cả người dùng về Offline.");
+        } catch (SQLException e) { e.printStackTrace(); }
     }
 }

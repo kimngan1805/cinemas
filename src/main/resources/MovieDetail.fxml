@@ -103,9 +103,27 @@
                                 <Button onAction="#handleCloseCreateRoom" styleClass="btn-close-modal" text="✕" />
                             </children>
                         </HBox>
+
+                        <!-- ⭐ THÊM LABEL THÔNG BÁO TẠI ĐÂY -->
+                        <Label fx:id="lblRoomTypeInfo" text="" wrapText="true"
+                               style="-fx-background-color: rgba(255,170,0,0.1); -fx-padding: 12; -fx-background-radius: 6; -fx-border-color: #ffaa00; -fx-border-width: 1; -fx-border-radius: 6;" />
+
+                        <HBox alignment="CENTER_LEFT" spacing="15.0" style="-fx-background-color: rgba(255,255,255,0.05); -fx-padding: 15; -fx-background-radius: 8;">
+                            <children>
+                                <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                    <children>
+                                        <Label style="-fx-text-fill: white; -fx-font-weight: bold;" text="🌍 Phòng công khai" />
+                                        <Label style="-fx-text-fill: #999; -fx-font-size: 12px;" text="Bất kỳ ai cũng có thể tham gia (không cần mời)" wrapText="true" />
+                                    </children>
+                                </VBox>
+                                <CheckBox fx:id="chkPublicRoom" />
+                            </children>
+                        </HBox>
+
                         <ScrollPane fitToWidth="true" styleClass="friend-scroll-grid" VBox.vgrow="ALWAYS">
                             <content><FlowPane fx:id="flowFriendSelection" hgap="20.0" vgap="25.0" /></content>
                         </ScrollPane>
+
                         <Button maxWidth="Infinity" onAction="#handleStartWatchingWithFriends" styleClass="btn-register-now" text="BẮT ĐẦU XEM" />
                     </children>
                     <padding><Insets bottom="30.0" left="30.0" right="30.0" top="25.0" /></padding>

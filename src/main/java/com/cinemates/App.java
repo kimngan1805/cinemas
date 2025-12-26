@@ -26,12 +26,11 @@ public class App extends Application {
         // Xử lý khi nhấn nút X tắt app
         stage.setOnCloseRequest(event -> {
             if (currentUser != null) {
-                // Báo cho Database là mình đã Offline
+                // 1. Cập nhật DB về Offline
                 DatabaseHandler.updateOnlineStatus(currentUser.getId(), false);
-                System.out.println("✅ " + currentUser.getUsername() + " đã thoát app, trạng thái: Offline");
+                System.out.println("👋 Đã set Offline cho " + currentUser.getUsername());
             }
-            Platform.exit();
-            System.exit(0);
+            System.exit(0); // Tắt sạch các luồng chạy ngầm
         });
     }
 
