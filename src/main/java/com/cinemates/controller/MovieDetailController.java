@@ -1,5 +1,8 @@
 package com.cinemates.controller;
 
+import com.cinemates.App;
+import com.cinemates.model.User;
+import com.cinemates.utils.DatabaseHandler;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -57,30 +60,40 @@ public class MovieDetailController implements Initializable {
         loadFriendsToSelection();
     }
 
+    // MovieDetailController.java
     private void loadFriendsToSelection() {
         flowFriendSelection.getChildren().clear();
-        selectedFriends.clear();
-        String[] myFriends = {"Kim Ngân", "Bé Hằng", "Anh Tài", "Mỹ Linh", "Gia Bảo"};
+        selectedFriends.clear(); // Danh sách lưu tên/ID những người được tick chọn
 
-        for (String name : myFriends) {
+        // 1. Lấy danh sách bạn bè THẬT từ Database
+        if (App.currentUser == null) return;
+        List<User> myFriends = DatabaseHandler.getFriendsList(App.currentUser.getId());
+
+        for (User friend : myFriends) {
+            // 2. Tạo giao diện card cho từng người bạn
             VBox card = new VBox(10);
             card.getStyleClass().add("friend-select-item");
             card.setAlignment(javafx.geometry.Pos.CENTER);
-            Label avatar = new Label(name.substring(0, 1).toUpperCase());
+
+            Label avatar = new Label(friend.getUsername().substring(0, 1).toUpperCase());
             avatar.getStyleClass().add("avatar-circle-green");
-            Label lblName = new Label(name);
+
+            Label lblName = new Label(friend.getUsername());
             lblName.setStyle("-fx-text-fill: white; -fx-font-weight: bold;");
+
             card.getChildren().addAll(avatar, lblName);
 
+            // 3. Logic khi nhấn vào để chọn (Toggle Selection)
             card.setOnMouseClicked(e -> {
                 if (card.getStyleClass().contains("friend-select-active")) {
                     card.getStyleClass().remove("friend-select-active");
-                    selectedFriends.remove(name);
+                    selectedFriends.remove(friend.getUsername());
                 } else {
                     card.getStyleClass().add("friend-select-active");
-                    selectedFriends.add(name);
+                    selectedFriends.add(friend.getUsername());
                 }
             });
+
             flowFriendSelection.getChildren().add(card);
         }
     }

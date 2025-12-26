@@ -36,7 +36,17 @@ public class WatchRoomController {
     public void initRoomData(String movieName, List<String> friends) {
         // 1. Tạo mã phòng ngẫu nhiên
         lblRoomCode.setText("CIN-" + (int)(Math.random() * 899 + 100) + "-MATES");
-
+        vboxParticipants.getChildren().clear();
+        Label me = new Label("• Bạn (Chủ phòng)");
+        me.setStyle("-fx-text-fill: #00ff40; -fx-font-weight: bold;");
+        vboxParticipants.getChildren().add(me);
+        if (friends != null) {
+            for (String friendName : friends) {
+                Label lbl = new Label("• " + friendName);
+                lbl.setStyle("-fx-text-fill: white;");
+                vboxParticipants.getChildren().add(lbl);
+            }
+        }
         // 2. Load Video mẫu (Dùng link web để test)
         try {
             Media media = new Media("https://www.w3schools.com/html/mov_bbb.mp4");
